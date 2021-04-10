@@ -423,6 +423,76 @@ void createClassList(string className, SchoolYear sy) {
 	fileOut << className << endl;
 	fileOut.close();
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+void createCourse();
+
+void readCourseFile(_course* &pHead) {
+	string path;
+	cout << "Input the name of the file contain sourse's info: ";
+	cin >> path;
+	wifstream fileIn;
+	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+	fileIn.open(path + ".csv", ios_base::in);
+	if (fileIn.fail())
+	{
+		cout << "File is not existed " << endl;
+		createCourse();
+	}
+	_course* pCur = nullptr;
+	wstring temp;
+	wchar_t a = ',';
+	while (fileIn) {
+		if (pHead == nullptr) {
+			pHead = new _course;
+			pCur = pHead;
+			pHead->pPrevious = nullptr;
+		}
+		else {
+			pCur->pNext = new _course;
+			pCur = pCur->pNext;
+		}
+		getline(fileIn, temp, a);
+		pCur->data.courseId = wstringToLong(temp);
+		getline(fileIn, pCur->data.courseName, a);
+		getline(fileIn, pCur->data.teacherName, a);
+		getline(fileIn, temp, a);
+		pCur->data.credit = wstringToInt(temp);
+		getline(fileIn, temp, a);
+		pCur->data.maxStu = wstringToInt(temp);
+		pCur->pNext = nullptr;
+	}
+	fileIn.close();
+}
+
+void writeCourseFile(_course* pHead) {
+	wofstream fileOut;
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	while (pHead->pNext != nullptr) {
+		fileOut << pHead->data.courseId << "," << pHead->data.courseName << "," << pHead->data.credit << "," << pHead->data.maxStu << endl;
+		pHead = pHead->pNext;
+	}
+
+	fileOut.close();
+}
+
+void createCourse() {
+	int flag = -1;
+	while (flag != 0) {
+		cout << "1. Input course from keyboard\n2. Input course from file .csv\n0. Escape\n";
+		cin >> flag;
+		switch (flag) {
+		case 1:
+
+			break;
+		case 2:
+
+			break;
+		default:
+			break;
+		}
+	}
+}
 
 void AtTheBeginningOfSchoolYear() {
 	system("CLS");
@@ -514,9 +584,11 @@ int main()
 
 	//AtTheBeginningOfSchoolYear();
 
-	unsigned long long ID = NULL;
+	/*unsigned long long ID = NULL;
 	string className = "";
-	login(ID, className);
+	login(ID, className);*/
+
+
 
 	return 0;
 }
