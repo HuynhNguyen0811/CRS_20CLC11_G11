@@ -4,15 +4,18 @@
 #include <stdio.h>
 #include <Windows.h>
 
-#include <time.h>  
+#include <time.h>  //take time
+
 #include <string>
 #include <fstream>
 #include <filesystem>
 
+#include <direct.h> //create folder
+
 #include<io.h>
 #include <fcntl.h>
 
-#include<locale>
+#include<locale> //imbue
 #include<codecvt>
 
 using namespace std;

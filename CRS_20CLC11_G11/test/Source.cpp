@@ -571,6 +571,7 @@ unsigned long long takeTime() {
 	return seconds;
 }
 
+#include <direct.h>
 
 int main()
 {
@@ -588,7 +589,20 @@ int main()
 	string className = "";
 	login(ID, className);*/
 
+	_mkdir("myfolder");
+	_mkdir("myfolder\\alo");
+	ofstream fileOut;
+	string path;
+	string pathCon1 = "myfolder\\alo\\";
+	string pathCon2 = "okechua";
+	string pathCon3 = ".csv";
+	
+	//code ngon
+	path = pathCon1 + pathCon2 + pathCon3;
 
+	fileOut.open(path, ios_base::out);
 
+	fileOut << 1 << endl;
+	fileOut.close();
 	return 0;
 }

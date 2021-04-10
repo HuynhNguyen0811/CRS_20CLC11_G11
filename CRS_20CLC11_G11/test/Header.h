@@ -50,10 +50,24 @@ struct SchoolYear {
 	int y;
 };
 
-struct Course {
-	string Course_ID;
-	string Course_Name;
-	string Teacher_Name;
-	int Number_Of_Credits;
-	int MaxStu;
+struct session {
+	std::string dayOfWeek;
+	std::string hour;
+};
+struct _session {
+	session data;
+	_session* pNext, * pPrevious;
+};
+
+struct course {
+	unsigned long long courseId;
+	std::wstring courseName;
+	std::wstring teacherName;
+	int credit;
+	int maxStu = 50;
+	_session* session;
+};
+struct _course {
+	course data;
+	_course* pNext, * pPrevious;
 };
