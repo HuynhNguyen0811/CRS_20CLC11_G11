@@ -45,6 +45,15 @@ struct NodeStudent {
 	NodeStudent* pNext;
 };
 
+struct Class {
+	string name;
+	NodeStudent* student;
+};
+struct _Class {
+	Class data;
+	_Class* pNext, * pPrevious;
+};
+
 struct SchoolYear {
 	int x;
 	int y;
