@@ -14,8 +14,10 @@ void _SText() { // tat tieng viet
 int stringToInt(string str) {
 	int sum = 0;
 	for (int i = 0; i < str.size(); i++) {
-		sum *= 10;
-		sum += (int)(str[i] - 48);
+		if ((int)(str[i] - 48) >= 0 && (int)(str[i] - 48) <= 9) {
+			sum *= 10;
+			sum += (int)(str[i] - 48);
+		}
 	}
 	return sum;
 }
@@ -23,8 +25,10 @@ int stringToInt(string str) {
 unsigned long long stringToLong(string str) {
 	unsigned long long sum = 0;
 	for (int i = 0; i < str.size(); i++) {
-		sum *= 10;
-		sum += (unsigned long long)(str[i] - 48);
+		if ((unsigned long long)(str[i] - 48) >= 0 && (unsigned long long)(str[i] - 48) <= 9) {
+			sum *= 10;
+			sum += (unsigned long long)(str[i] - 48);
+		}
 	}
 	return sum;
 }

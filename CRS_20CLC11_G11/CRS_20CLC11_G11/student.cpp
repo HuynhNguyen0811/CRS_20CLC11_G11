@@ -31,7 +31,6 @@ void menuStudent(unsigned long long& ID, string className) {
 void login(unsigned long long& ID, string& className) {
 	system("CLS");
 	int flag, out;
-	//unsigned long long ID = NULL;
 	string password = "";
 	bool check = 0;
 	cout << "Login as student or staff: \n1.Student\n2.Staff\nEnter any others value to escape\n";
@@ -125,9 +124,9 @@ void findInfoStudent(student stu) {
 
 bool checkLogin(string path, unsigned long long ID, string password, string& className) {
 	ifstream fileIn;
-	fileIn.open(path + ".csv", ios_base::in);
+	fileIn.open(path + ".csv", ios_base::in); 
 	string temp, tempPassword, tempClassName, checkPassword = "";
-	unsigned long long tempID, checkID = NULL;
+	unsigned long long tempID = NULL, checkID = NULL;
 	while (fileIn) {
 		getline(fileIn, temp, ',');
 		tempID = stringToLong(temp);

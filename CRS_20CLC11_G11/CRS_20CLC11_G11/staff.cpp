@@ -29,29 +29,26 @@ void loadClassName(string className, _Class*& pHeadClass) {
 	fileIn.close();
 }
 
-void menuStaff() {
-	system("CLS");
-	cout << "Log in as staff successfull";
-	int flag;
-	cin >> flag;
-	switch (flag) {
-	case 1:
-		break;
-	case 2:
-		break;
-	case 3:
-		break;
-	}
-}
 
+void createClassListFile(string folderName, string className) {
+	ofstream fileOut;
+	string path, pathSub = ".csv";
+	path = folderName + "className" + pathSub;
+	fileOut.open(path, ios_base::app);
+
+	fileOut << className << endl;
+
+
+	fileOut.close();
+}
 void AtTheBeginningOfSchoolYear() {
 	system("CLS");
 	//SchoolYear sy;
 	_student* pHead = nullptr;
 	string className;
 	_Class* pHeadClass = nullptr;
-	//createSchoolYear(sy);
-	//cout << "Creating a school year (" << sy.x << "-" << sy.y << ")" << endl;
+	_mkdir("2021");
+
 	int flag;
 	cout << "Choose method to input class name\n1.From keyboard\n2.From a file\n0.Escape";
 	cin >> flag;
@@ -60,13 +57,12 @@ void AtTheBeginningOfSchoolYear() {
 		while (true) {
 			cout << "Creating a class:\nPlease enter class name: ";
 			cin >> className;
-			//createClassList(to_string(sy.x) + to_string(sy.y) + "year1" + className, sy);
-			string path, newPath;
+			createClassListFile("2021\\", className);
+			string path, folderName = "2021\\", newPath, pathSub = ".csv";
 			readFileStudent(path, pHead);
 			createLogInStudent("passStudent", pHead, className);
-			//newPath = to_string(sem.x) + "-" + to_string(sem.y) + className;
-			//rename(path + ".csv", newPath + ".csv");
-			writeFileStudent(/*to_string(sy.x) + to_string(sy.y) + "year1" + */className, pHead);
+			newPath = folderName + className;
+			writeFileStudent(newPath, pHead);
 			deleteListStudent(pHead);
 			int temp;
 			cout << "Input '0' if you want to escape: ";
@@ -91,7 +87,7 @@ void AtTheBeginningOfSchoolYear() {
 			createLogInStudent("passStudent", pHeadClass->data.student, pHeadClass->data.name);
 			//newPath = to_string(sem.x) + "-" + to_string(sem.y) + className;
 			//rename(path + ".csv", newPath + ".csv");
-			writeFileStudent(/*to_string(sy.x) + to_string(sy.y) + "year1" + */pHeadClass->data.name, pHeadClass->data.student);
+			writeFileStudent(pHeadClass->data.name, pHeadClass->data.student);
 			deleteListStudent(pHeadClass->data.student);
 			pHeadClass = pHeadClass->pNext;
 		}
@@ -103,6 +99,80 @@ void AtTheBeginningOfSchoolYear() {
 		break;
 	}
 }
+
+
+void menuStaff() {
+	system("CLS");
+	cout << "Log in as staff successfull";
+	int flag;
+	cin >> flag;
+	switch (flag) {
+	case 1:
+		break;
+	case 2:
+		break;
+	case 3:
+		break;
+	}
+}
+
+/*void AtTheBeginningOfSchoolYear() {
+	system("CLS");
+	//SchoolYear sy;
+	_student* pHead = nullptr;
+	string className;
+	_Class* pHeadClass = nullptr;
+	//createSchoolYear(sy);
+	//cout << "Creating a school year (" << sy.x << "-" << sy.y << ")" << endl;
+	int flag;
+	cout << "Choose method to input class name\n1.From keyboard\n2.From a file\n0.Escape";
+	cin >> flag;
+	switch (flag) {
+	case 1:
+		while (true) {
+			cout << "Creating a class:\nPlease enter class name: ";
+			cin >> className;
+			//createClassList(to_string(sy.x) + to_string(sy.y) + "year1" + className, sy);
+			string path, newPath;
+			readFileStudent(path, pHead);
+			createLogInStudent("passStudent", pHead, className);
+			writeFileStudent(className, pHead);
+			deleteListStudent(pHead);
+			int temp;
+			cout << "Input '0' if you want to escape: ";
+			cin >> temp;
+			if (temp == 0) {
+				system("CLS");
+				break;
+			}
+		}
+		menuStaff();
+		break;
+	case 2:
+		cout << "Please enter file that contain class name: ";
+		cin >> className;
+		loadClassName(className, pHeadClass);
+		if (pHeadClass == nullptr) menuStaff();
+		while (pHeadClass->pNext != nullptr) {
+			//createClassList(to_string(sy.x) + to_string(sy.y) + "year1" + pHeadClass->data.name, sy);
+			string path, newPath;
+			pHeadClass->data.student = nullptr;
+			readFileStudent(path, pHeadClass->data.student);
+			createLogInStudent("passStudent", pHeadClass->data.student, pHeadClass->data.name);
+			//newPath = to_string(sem.x) + "-" + to_string(sem.y) + className;
+			//rename(path + ".csv", newPath + ".csv");
+			writeFileStudent(pHeadClass->data.name, pHeadClass->data.student);
+			deleteListStudent(pHeadClass->data.student);
+			pHeadClass = pHeadClass->pNext;
+		}
+		deleteListClass(pHeadClass);
+		menuStaff();
+		break;
+	default:
+		menuStaff();
+		break;
+	}
+}*/
 
 void AtTheBeginningOfSemester() {
 	int* flag = new int;

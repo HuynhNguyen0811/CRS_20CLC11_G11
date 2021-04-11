@@ -13,7 +13,7 @@ int main()
 	createSchoolYear(sy);
 	cout << sy.x << "-" << sy.y << endl;*/
 
-	//AtTheBeginningOfSchoolYear();
+	AtTheBeginningOfSchoolYear();
 
 	unsigned long long ID = NULL;
 	string className = "";
