@@ -74,23 +74,6 @@ void _SText() { // tat tieng viet
 	_setmode(_fileno(stdout), _O_TEXT);
 }
 
-void editFilePassword(string path, unsigned long long ID, string className, string newPassword) {
-	ofstream fileOut;
-	fileOut.open(path + ".csv", ios_base::app);
-	fileOut << ID << "," << newPassword << "," << className << endl;
-	fileOut.close();
-}
-
-void changePassword(unsigned long long ID, string className) {
-	string newPassword;
-	cout << "New password: ";
-	cin >> newPassword;
-	editFilePassword("passStudent", ID, className, newPassword);
-	cout << "Change successfully\n";
-	system("PAUSE");
-	menuStudent(ID, className);
-}
-
 int wstringToInt(wstring str) {
 	int sum = 0;
 	for (int i = 0; i < str.size(); i++) {
@@ -183,6 +166,7 @@ void login(unsigned long long& ID, string& className) {
 		break;
 	}
 }
+void changePassword(unsigned long long ID, string className);
 
 void menuStudent(unsigned long long& ID, string className) {
 	system("CLS");
@@ -275,22 +259,45 @@ void infoStudent(WStudent stu) {
 bool checkLogin(string path, unsigned long long ID, string password, string& className) {
 	ifstream fileIn;
 	fileIn.open(path + ".csv", ios_base::in);
-
-	string temp, tempPassword, tempClassName;
-	unsigned long long tempID;
+	string temp, tempPassword, tempClassName, checkPassword = "";
+	unsigned long long tempID, checkID = NULL;
 	while (fileIn) {
 		getline(fileIn, temp, ',');
 		tempID = stringToLong(temp);
 		getline(fileIn, tempPassword, ',');
 		fileIn >> tempClassName;
-		if (tempID == ID && tempPassword == password) {
+		if (tempID == ID) {
 			className = tempClassName;
-			fileIn.close();
-			return 1;
+			checkID = tempID;
+			checkPassword = tempPassword;
 		}
 	}
-	fileIn.close();
-	return 0;
+	if (checkID == ID && checkPassword == password) {
+		className = tempClassName;
+		fileIn.close();
+		return 1;
+	}
+	else {
+		fileIn.close();
+		return 0;
+	}
+}
+
+void editFilePassword(string path, unsigned long long ID, string className, string newPassword) {
+	ofstream fileOut;
+	fileOut.open(path + ".csv", ios_base::app);
+	fileOut << ID << "," << newPassword << "," << className << endl;
+	fileOut.close();
+}
+
+void changePassword(unsigned long long ID, string className) {
+	string newPassword;
+	cout << "New password: ";
+	cin >> newPassword;
+	editFilePassword("passStudent", ID, className, newPassword);
+	cout << "Change successfully\n";
+	system("PAUSE");
+	menuStudent(ID, className);
 }
 
 void createSchoolYear(SchoolYear& sy) {

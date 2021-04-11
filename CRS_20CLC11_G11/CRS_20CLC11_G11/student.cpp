@@ -1,13 +1,5 @@
-#include "bigData.h"
-#include "struct.h"
-
-void menuStudent(unsigned long long& ID, string className);
-void login(unsigned long long& ID, string& className);
-bool checkLogin(string path, unsigned long long ID, string password, string& className);
-void findInfoStudent(student stu);
-void findAndPrintStudent(unsigned long long ID, string className);
-void changePassword(unsigned long long ID, string className);
-void editFilePassword(string path, unsigned long long ID, string className, string newPassword);
+#include "student.h"
+#include "staff.h"
 
 void menuStudent(unsigned long long& ID, string className) {
 	system("CLS");
@@ -77,7 +69,7 @@ void login(unsigned long long& ID, string& className) {
 			check = checkLogin("passStaff", ID, password, className);
 		}
 		system("CLS");
-		//menuStaff();
+		menuStaff();
 		break;
 	default:
 		break;
@@ -130,6 +122,7 @@ void findInfoStudent(student stu) {
 	wcout << "Social ID: " << stu.Social_ID << endl;
 	_SText();
 }
+
 bool checkLogin(string path, unsigned long long ID, string password, string& className) {
 	ifstream fileIn;
 	fileIn.open(path + ".csv", ios_base::in);

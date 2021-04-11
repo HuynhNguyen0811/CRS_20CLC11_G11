@@ -1,3 +1,6 @@
+#ifndef _DATA_H_
+#define _DATA_H_
+
 #include "struct.h"
 
 #include <iostream>
@@ -30,3 +33,12 @@ Date stringToDate(string str);
 int wstringToInt(wstring str);
 unsigned long long wstringToLong(wstring str);
 Date wstringToDate(wstring str);
+
+void readFileStudent(string& path, _student*& pHead);
+void writeFileStudent(string path, _student* pHead);
+void createLogInStudent(string path, _student* pHead, string classname);
+void deleteListStudent(_student*& pHead);
+
+void loadClassName(string className, _Class*& pHeadClass);
+
+#endif

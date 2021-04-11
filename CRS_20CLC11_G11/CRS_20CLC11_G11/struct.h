@@ -1,4 +1,22 @@
+#ifndef _STRUCT_H_
+#define _STRUCT_H_
+
 #include <iostream>
+
+struct student;
+struct _student;
+struct Class;
+struct _Class;
+struct semester;
+struct _semester;
+struct session;
+struct _session;
+struct course;
+struct _course;
+struct score;
+struct _score;
+struct account;
+struct _account;
 
 struct Date {
 	int day, month, year;
@@ -13,7 +31,7 @@ struct student {
 	Date Date_Of_Birth;
 	unsigned long long Social_ID;
 
-	_score* score = nullptr;
+	//_score* score = nullptr;
 	_course* course = nullptr;
 
 	double GPA = 0;
@@ -25,7 +43,7 @@ struct _student {
 
 struct Class {
 	std::string name;
-	_student* studentFirst;
+	_student* student;
 };
 struct _Class {
 	Class data;
@@ -51,8 +69,8 @@ struct _session {
 
 struct course {
 	unsigned long long courseId;
-	std::string courseName;
-	std::string teacherName;
+	std::wstring courseName;
+	std::wstring teacherName;
 	int credit;
 	int maxStu = 50;
 	_session* session;
@@ -79,3 +97,5 @@ struct _account {
 	account data;
 	_account* pNext, * pPrevious;
 }; 
+
+#endif
