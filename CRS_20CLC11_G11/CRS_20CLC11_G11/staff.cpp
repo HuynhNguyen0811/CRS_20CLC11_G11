@@ -29,15 +29,11 @@ void loadClassName(string className, _Class*& pHeadClass) {
 	fileIn.close();
 }
 
-
-void createClassListFile(string folderName, string className) {
+void createClassListFile(string path, string className) {
 	ofstream fileOut;
-	string path, pathSub = ".csv";
-	path = folderName + "className" + pathSub;
 	fileOut.open(path, ios_base::app);
 
 	fileOut << className << endl;
-
 
 	fileOut.close();
 }
@@ -47,8 +43,12 @@ void AtTheBeginningOfSchoolYear() {
 	_student* pHead = nullptr;
 	string className;
 	_Class* pHeadClass = nullptr;
-	_mkdir("2021");
 
+	_mkdir("Data");
+	_mkdir("Data\\Classes");
+
+	string path; //duong dan cua file test case input class
+	string folderName = "Data\\", newPath, fileFormat = ".csv", pathSub = "Classes\\";
 	int flag;
 	cout << "Choose method to input class name\n1.From keyboard\n2.From a file\n0.Escape";
 	cin >> flag;
@@ -57,12 +57,18 @@ void AtTheBeginningOfSchoolYear() {
 		while (true) {
 			cout << "Creating a class:\nPlease enter class name: ";
 			cin >> className;
-			createClassListFile("2021\\", className);
-			string path, folderName = "2021\\", newPath, pathSub = ".csv";
+
+			newPath = folderName + pathSub + "Class_Name" + fileFormat;
+			createClassListFile(newPath, className);
+
 			readFileStudent(path, pHead);
-			createLogInStudent("passStudent", pHead, className);
-			newPath = folderName + className;
+
+			newPath = folderName + "passStudent";
+			createLogInStudent(newPath, pHead, className);
+
+			newPath = folderName + pathSub + className + fileFormat;
 			writeFileStudent(newPath, pHead);
+
 			deleteListStudent(pHead);
 			int temp;
 			cout << "Input '0' if you want to escape: ";
@@ -80,14 +86,19 @@ void AtTheBeginningOfSchoolYear() {
 		loadClassName(className, pHeadClass);
 		if (pHeadClass == nullptr) menuStaff();
 		while (pHeadClass->pNext != nullptr) {
-			//createClassList(to_string(sy.x) + to_string(sy.y) + "year1" + pHeadClass->data.name, sy);
-			string path, newPath;
+
+			newPath = folderName + pathSub + "Class_Name" + fileFormat;
+			createClassListFile(newPath, pHeadClass->data.name);
+
 			pHeadClass->data.student = nullptr;
 			readFileStudent(path, pHeadClass->data.student);
-			createLogInStudent("passStudent", pHeadClass->data.student, pHeadClass->data.name);
-			//newPath = to_string(sem.x) + "-" + to_string(sem.y) + className;
-			//rename(path + ".csv", newPath + ".csv");
-			writeFileStudent(pHeadClass->data.name, pHeadClass->data.student);
+
+			newPath = folderName + "passStudent";
+			createLogInStudent(newPath, pHeadClass->data.student, pHeadClass->data.name);
+
+			newPath = folderName + pHeadClass->data.name + fileFormat;
+			writeFileStudent(newPath, pHeadClass->data.student);
+
 			deleteListStudent(pHeadClass->data.student);
 			pHeadClass = pHeadClass->pNext;
 		}

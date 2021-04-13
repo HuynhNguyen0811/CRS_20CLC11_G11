@@ -145,7 +145,7 @@ void readFileStudent(string& path, _student*& pHead) {
 
 void writeFileStudent(string path, _student* pHead) {
 	wofstream fileOut;
-	fileOut.open(path + ".csv", ios_base::out);
+	fileOut.open(path, ios_base::out);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 	while (pHead->pNext != nullptr) {
 		fileOut << pHead->data.No << L"," << pHead->data.Student_ID << L"," << pHead->data.FirstName << L"," << pHead->data.LastName << L"," << pHead->data.Gender << L"," << pHead->data.Date_Of_Birth.day << wchar_t(47) << pHead->data.Date_Of_Birth.month << wchar_t(47) << pHead->data.Date_Of_Birth.year << L"," << pHead->data.Social_ID << endl;

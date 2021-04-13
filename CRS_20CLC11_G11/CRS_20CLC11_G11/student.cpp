@@ -77,7 +77,10 @@ void login(unsigned long long& ID, string& className) {
 
 void findAndPrintStudent(unsigned long long ID, string className) {
 	wifstream fileIn;
-	fileIn.open(className + ".csv", ios_base::in);
+	string folderName = "Data\\Classes\\";
+	string fileFormat = ".csv";
+	string path = folderName + className + fileFormat;
+	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
 	student stu;
