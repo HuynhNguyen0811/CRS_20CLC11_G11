@@ -15,9 +15,9 @@ int main()
 
 	AtTheBeginningOfSchoolYear();
 
-	/*unsigned long long ID = NULL;
+	unsigned long long ID = NULL;
 	string className = "";
-	login(ID, className);*/
+	login(ID, className);
 
 	//_mkdir("myfolder");
 	//_mkdir("myfolder\\alo");

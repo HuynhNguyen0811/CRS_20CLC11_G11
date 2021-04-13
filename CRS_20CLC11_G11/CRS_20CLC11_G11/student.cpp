@@ -33,6 +33,10 @@ void login(unsigned long long& ID, string& className) {
 	int flag, out;
 	string password = "";
 	bool check = 0;
+	string path;
+	string folderName = "Data\\";
+	string pathSub = "Classes\\", fileFormat = ".csv";
+
 	cout << "Login as student or staff: \n1.Student\n2.Staff\nEnter any others value to escape\n";
 	cin >> flag;
 	switch (flag) {
@@ -47,8 +51,9 @@ void login(unsigned long long& ID, string& className) {
 			cout << "ID: ";
 			cin >> ID;
 			cout << "Password: ";
-			cin >> password;
-			check = checkLogin("passStudent", ID, password, className);
+			cin >> password;	
+			path = folderName + "passStudent" + fileFormat;
+			check = checkLogin(path, ID, password, className);
 		}
 		system("CLS");
 		menuStudent(ID, className);
@@ -65,7 +70,8 @@ void login(unsigned long long& ID, string& className) {
 			cin >> ID;
 			cout << "Password: ";
 			cin >> password;
-			check = checkLogin("passStaff", ID, password, className);
+			path = folderName + "passStudent" + fileFormat;
+			check = checkLogin(path, ID, password, className);
 		}
 		system("CLS");
 		menuStaff();
@@ -127,7 +133,7 @@ void findInfoStudent(student stu) {
 
 bool checkLogin(string path, unsigned long long ID, string password, string& className) {
 	ifstream fileIn;
-	fileIn.open(path + ".csv", ios_base::in); 
+	fileIn.open(path, ios_base::in); 
 	string temp, tempPassword, tempClassName, checkPassword = "";
 	unsigned long long tempID = NULL, checkID = NULL;
 	while (fileIn) {
@@ -154,7 +160,7 @@ bool checkLogin(string path, unsigned long long ID, string password, string& cla
 
 void editFilePassword(string path, unsigned long long ID, string className, string newPassword) {
 	ofstream fileOut;
-	fileOut.open(path + ".csv", ios_base::app);
+	fileOut.open(path, ios_base::app);
 	fileOut << ID << "," << newPassword << "," << className << endl;
 	fileOut.close();
 }
@@ -163,7 +169,7 @@ void changePassword(unsigned long long ID, string className) {
 	string newPassword;
 	cout << "New password: ";
 	cin >> newPassword;
-	editFilePassword("passStudent", ID, className, newPassword);
+	editFilePassword("Data\\Classes\\passStudent.csv", ID, className, newPassword);
 	cout << "Change successfully\n";
 	system("PAUSE");
 	menuStudent(ID, className);
