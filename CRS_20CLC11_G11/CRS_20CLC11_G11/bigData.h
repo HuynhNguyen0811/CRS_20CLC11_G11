@@ -23,17 +23,6 @@
 
 using namespace std;
 
-void _LText();
-void _SText();
-
-int stringToInt(string str);
-unsigned long long stringToLong(string str);
-Date stringToDate(string str);
-
-int wstringToInt(wstring str);
-unsigned long long wstringToLong(wstring str);
-Date wstringToDate(wstring str);
-
 void readFileStudent(string& path, _student*& pHead);
 void writeFileStudent(string path, _student* pHead);
 void createLogInStudent(string path, _student* pHead, string classname);

@@ -10,7 +10,6 @@ struct _Class;
 struct semester;
 struct _semester;
 struct session;
-struct _session;
 struct course;
 struct _course;
 struct score;
@@ -59,21 +58,16 @@ struct _semester {
 };
 
 struct session {
-	std::string dayOfWeek;
-	std::string hour;
+	wchar_t* dayOfWeek;
+	wchar_t* hour;
 };
-struct _session {
-	session data;
-	_session* pNext, * pPrevious;
-};
-
 struct course {
 	unsigned long long courseId;
 	std::wstring courseName;
 	std::wstring teacherName;
 	int credit;
 	int maxStu = 50;
-	_session* session;
+	session* session;
 };
 struct _course {
 	course data;

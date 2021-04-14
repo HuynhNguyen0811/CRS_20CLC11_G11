@@ -1,8 +1,23 @@
 #include "staff.h"
+#include "commonFunc.h"
 
 void deleteListClass(_Class*& pHead) {
 	_Class* pTmp = pHead;
 	while (pHead != nullptr) {
+		pHead = pHead->pNext;
+		delete pTmp;
+		pTmp = pHead;
+	}
+}
+
+void deleteListCourse(_course*& pHead) {
+	_course* pTmp = pHead;
+	while (pHead != nullptr) {
+		for (int i = 0; i < 2; i++) {
+			delete[] pHead->data.session->dayOfWeek;
+			delete[] pHead->data.session->hour;
+		}
+		delete[] pHead->data.session;
 		pHead = pHead->pNext;
 		delete pTmp;
 		pTmp = pHead;
@@ -81,7 +96,7 @@ void AtTheBeginningOfSchoolYear() {
 		menuStaff();
 		break;
 	case 2:
-		cout << "Please enter file that contain class name: ";
+		cout << "Please enter file name that contains class name: ";
 		cin >> className;
 		loadClassName(className, pHeadClass);
 		if (pHeadClass == nullptr) menuStaff();
@@ -96,7 +111,7 @@ void AtTheBeginningOfSchoolYear() {
 			newPath = folderName + "passStudent";
 			createLogInStudent(newPath, pHeadClass->data.student, pHeadClass->data.name);
 
-			newPath = folderName + pHeadClass->data.name + fileFormat;
+			newPath = folderName + pathSub + pHeadClass->data.name + fileFormat;
 			writeFileStudent(newPath, pHeadClass->data.student);
 
 			deleteListStudent(pHeadClass->data.student);
@@ -110,7 +125,6 @@ void AtTheBeginningOfSchoolYear() {
 		break;
 	}
 }
-
 
 void menuStaff() {
 	system("CLS");
@@ -126,64 +140,6 @@ void menuStaff() {
 		break;
 	}
 }
-
-/*void AtTheBeginningOfSchoolYear() {
-	system("CLS");
-	//SchoolYear sy;
-	_student* pHead = nullptr;
-	string className;
-	_Class* pHeadClass = nullptr;
-	//createSchoolYear(sy);
-	//cout << "Creating a school year (" << sy.x << "-" << sy.y << ")" << endl;
-	int flag;
-	cout << "Choose method to input class name\n1.From keyboard\n2.From a file\n0.Escape";
-	cin >> flag;
-	switch (flag) {
-	case 1:
-		while (true) {
-			cout << "Creating a class:\nPlease enter class name: ";
-			cin >> className;
-			//createClassList(to_string(sy.x) + to_string(sy.y) + "year1" + className, sy);
-			string path, newPath;
-			readFileStudent(path, pHead);
-			createLogInStudent("passStudent", pHead, className);
-			writeFileStudent(className, pHead);
-			deleteListStudent(pHead);
-			int temp;
-			cout << "Input '0' if you want to escape: ";
-			cin >> temp;
-			if (temp == 0) {
-				system("CLS");
-				break;
-			}
-		}
-		menuStaff();
-		break;
-	case 2:
-		cout << "Please enter file that contain class name: ";
-		cin >> className;
-		loadClassName(className, pHeadClass);
-		if (pHeadClass == nullptr) menuStaff();
-		while (pHeadClass->pNext != nullptr) {
-			//createClassList(to_string(sy.x) + to_string(sy.y) + "year1" + pHeadClass->data.name, sy);
-			string path, newPath;
-			pHeadClass->data.student = nullptr;
-			readFileStudent(path, pHeadClass->data.student);
-			createLogInStudent("passStudent", pHeadClass->data.student, pHeadClass->data.name);
-			//newPath = to_string(sem.x) + "-" + to_string(sem.y) + className;
-			//rename(path + ".csv", newPath + ".csv");
-			writeFileStudent(pHeadClass->data.name, pHeadClass->data.student);
-			deleteListStudent(pHeadClass->data.student);
-			pHeadClass = pHeadClass->pNext;
-		}
-		deleteListClass(pHeadClass);
-		menuStaff();
-		break;
-	default:
-		menuStaff();
-		break;
-	}
-}*/
 
 void AtTheBeginningOfSemester() {
 	int* flag = new int;
@@ -208,13 +164,18 @@ void AtTheBeginningOfSemester() {
 	delete flag;
 }
 
+void inputFromKeyboardCourse(_course* pHead) {
+
+}
+
 void readCourseFile(_course*& pHead) {
-	string path;
+	string path, fileFormat = ".csv";
 	cout << "Input the name of the file contain sourse's info: ";
 	cin >> path;
+	path += fileFormat;
 	wifstream fileIn;
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-	fileIn.open(path + ".csv", ios_base::in);
+	fileIn.open(path, ios_base::in);
 	if (fileIn.fail())
 	{
 		cout << "File is not existed " << endl;
@@ -222,7 +183,7 @@ void readCourseFile(_course*& pHead) {
 	}
 	_course* pCur = nullptr;
 	wstring temp;
-	wchar_t a = ',';
+	wchar_t a = ',', b = '\n';
 	while (fileIn) {
 		if (pHead == nullptr) {
 			pHead = new _course;
@@ -241,6 +202,19 @@ void readCourseFile(_course*& pHead) {
 		pCur->data.credit = wstringToInt(temp);
 		getline(fileIn, temp, a);
 		pCur->data.maxStu = wstringToInt(temp);
+		pCur->data.session = new session[2];
+		for (int i = 0; i < 2; i++) {
+			pCur->data.session[i].dayOfWeek = new wchar_t[3];
+			pCur->data.session[i].hour = new wchar_t[2];
+		}
+		getline(fileIn, temp, a);
+		wstringToWchar(pCur->data.session[0].dayOfWeek, temp);
+		getline(fileIn, temp, a);
+		wstringToWchar(pCur->data.session[0].hour, temp);
+		getline(fileIn, temp, a);
+		wstringToWchar(pCur->data.session[1].dayOfWeek, temp);
+		getline(fileIn, temp, b);
+		wstringToWchar(pCur->data.session[1].hour, temp);
 		pCur->pNext = nullptr;
 	}
 	fileIn.close();

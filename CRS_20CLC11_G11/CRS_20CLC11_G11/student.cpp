@@ -1,5 +1,6 @@
 #include "student.h"
 #include "staff.h"
+#include "commonFunc.h"
 
 void menuStudent(unsigned long long& ID, string className) {
 	system("CLS");
@@ -134,6 +135,7 @@ void findInfoStudent(student stu) {
 bool checkLogin(string path, unsigned long long ID, string password, string& className) {
 	ifstream fileIn;
 	fileIn.open(path, ios_base::in); 
+
 	string temp, tempPassword, tempClassName, checkPassword = "";
 	unsigned long long tempID = NULL, checkID = NULL;
 	while (fileIn) {
