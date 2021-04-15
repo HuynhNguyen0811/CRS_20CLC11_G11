@@ -35,6 +35,19 @@ void _SText() { // tat tieng viet
 	_setmode(_fileno(stdout), _O_TEXT);
 }
 
+//void CourseRegistrationResult(_Student* Node) {
+//	cout << " course registration result: ";
+//	int t = 0;
+//	if (Node != nullptr) {
+//		while ((Node->data.stu_Score) != nullptr) {
+//			cout << Node->data.stu_Score->data_ScoreBoard.course_Data.course_Name;
+//			t++;
+//			Node->data.stu_Score = Node->data.stu_Score->dataNext;
+//		}
+//	}
+//	if (t == 0) { cout << " there is no result"; }
+//}
+
 int stringToInt(string str) {
 	int sum = 0;
 	for (int i = 0; i < str.size(); i++) {

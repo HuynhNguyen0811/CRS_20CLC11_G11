@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="bigData.cpp" />
     <ClCompile Include="commonFunc.cpp" />
+    <ClCompile Include="graphic.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="staff.cpp" />
     <ClCompile Include="student.cpp" />

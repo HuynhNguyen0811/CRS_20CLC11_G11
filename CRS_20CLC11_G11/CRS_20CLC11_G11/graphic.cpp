@@ -1,37 +1,19 @@
-#include <iostream>
-#include <Windows.h>
-#include <string>
-#include <conio.h>
-using namespace std;
+#include "commonFunc.h"
+#include "graphic.h"
 
-
-void GotoXY(int x, int y)
-{
-	COORD coord;
-	coord.X = x;
-	coord.Y = y;
-	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
-}
-
-void ShowCur(bool CursorVisibility)
-{
-	HANDLE handle = GetStdHandle(STD_OUTPUT_HANDLE);
-	CONSOLE_CURSOR_INFO ConCurInf;
-
-	ConCurInf.dwSize = 10;
-	ConCurInf.bVisible = CursorVisibility;
-
-	SetConsoleCursorInfo(handle, &ConCurInf);
-}
-
-void textColor(int k) {
-	HANDLE hConsoleColor;
-	hConsoleColor = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hConsoleColor, k);
-}
-
+void drawChoosingOutlineStu(int x, int y);
+void drawOutlineStu(int x, int y);
+void drawChoosingOutlineStaff(int x, int y);
+void drawOutlineStaff(int x, int y);
+void writeMenuLogin(int x, int y);
+void designMenuLogin(int x, int y);
+void designMenuManageCourseStaff(int x, int y);
+void designMenuManageStudentStaff(int x, int y);
+void designMenuManageSystemStaff(int x, int y);
 void designMenuStaff(int x, int y);
+void designMenuManageCourseStudent(int x, int y);
 void designMenuStudent(int x, int y);
+
 
 void drawChoosingOutlineStu(int x, int y) {
 	textColor(3);
@@ -557,10 +539,4 @@ void designMenuStudent(int x, int y) {
 			break;
 		}
 	}
-}
-
-int main()
-{
-	designMenuLogin(0, 0);
-	return 0;
 }
