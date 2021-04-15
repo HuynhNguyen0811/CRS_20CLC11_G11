@@ -141,6 +141,7 @@
   <ItemGroup>
     <ClInclude Include="bigData.h" />
     <ClInclude Include="commonFunc.h" />
+    <ClInclude Include="graphic.h" />
     <ClInclude Include="staff.h" />
     <ClInclude Include="struct.h" />
     <ClInclude Include="student.h" />
