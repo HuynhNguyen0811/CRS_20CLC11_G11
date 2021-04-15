@@ -350,6 +350,48 @@ void displayCourseConsole(_course* pHead) {
 	_SText();
 }
 
+void createCourseFromKeyboard() {
+	_course* pHead = nullptr;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+
+	_mkdir("Data");
+	_mkdir("Data\\Course");
+
+	inputFromKeyboardCourse(pHead);
+
+	writeCourseFile(FolderPath + coursePath, pHead);
+
+	while (pHead->pNext != nullptr) {
+		writeIndividualCourseFile(FolderPath + to_string(pHead->data.courseId) + fileFormat, pHead->data);
+		pHead = pHead->pNext;
+	}
+
+	displayCourseConsole(pHead);
+
+	deleteListCourse(pHead);
+}
+
+void createCourseFromFile() {
+	_course* pHead = nullptr;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+
+	_mkdir("Data");
+	_mkdir("Data\\Course");
+
+	readCourseFile(pHead);
+
+	writeCourseFile(FolderPath + coursePath, pHead);
+
+	while (pHead->pNext != nullptr) {
+		writeIndividualCourseFile(FolderPath + to_string(pHead->data.courseId) + fileFormat, pHead->data);
+		pHead = pHead->pNext;
+	}
+
+	displayCourseConsole(pHead);
+
+	deleteListCourse(pHead);
+}
+
 void createCourse() {
 	int flag = -1;
 	while (flag != 0) {
@@ -357,10 +399,10 @@ void createCourse() {
 		cin >> flag;
 		switch (flag) {
 		case 1:
-
+			createCourseFromKeyboard();
 			break;
 		case 2:
-
+			createCourseFromFile();
 			break;
 		default:
 			break;

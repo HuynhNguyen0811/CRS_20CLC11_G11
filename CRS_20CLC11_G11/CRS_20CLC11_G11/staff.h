@@ -22,6 +22,9 @@ void addCourseListFile(string path, course* pHead);
 void addIndividualCourseFile(string path, course pHead);
 void displayCourseConsole(_course* pHead);
 
+void createCourseFromKeyboard();
+void createCourseFromFile();
+
 void createCourse();
 
 #endif
