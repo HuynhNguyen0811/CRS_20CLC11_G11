@@ -14,9 +14,10 @@ void deleteListCourse(_course*& pHead) {
 	_course* pTmp = pHead;
 	while (pHead != nullptr) {
 		for (int i = 0; i < 2; i++) {
-			delete[] pHead->data.session->dayOfWeek;
-			delete[] pHead->data.session->hour;
+			delete[] pHead->data.session[i].dayOfWeek;
+			delete[] pHead->data.session[i].hour;
 		}
+
 		delete[] pHead->data.session;
 		pHead = pHead->pNext;
 		delete pTmp;
@@ -164,13 +165,75 @@ void AtTheBeginningOfSemester() {
 	delete flag;
 }
 
-void inputFromKeyboardCourse(_course* pHead) {
+void inputFromKeyboardCourse(_course*& pHead) {
+	_course* pCur = nullptr;
+	int temp = -1, check;
+	wchar_t a = '\n';
+	while (temp != 0) {
+		if (pHead == nullptr) {
+			pHead = new _course;
+			pCur = pHead;
+			pHead->pPrevious = nullptr;
+		}
+		else {
+			pCur->pNext = new _course;
+			pCur = pCur->pNext;
+		}
 
+		cout << "Course's ID: ";
+		cin >> pCur->data.courseId;
+
+		cin.ignore(1000, '\n');
+
+		_LText();
+
+		wcout << "Course's name: ";
+		std::getline(wcin, pCur->data.courseName, L'\n');
+		wcout << "Teacher's name: ";
+		std::getline(wcin, pCur->data.teacherName, L'\n');
+
+		_SText();
+		cout << "Number of credits: ";
+		cin >> pCur->data.credit;
+		cout << "Do you want to change course's max student (default as 50, enter 1 to change): ";
+		cin >> check;
+		if (check == 1) {
+			cout << "Credit: ";
+			cin >> pCur->data.credit;
+		}
+
+		pCur->data.session = new session[2];
+		for (int i = 0; i < 2; i++) {
+			pCur->data.session[i].dayOfWeek = new wchar_t[3];
+			pCur->data.session[i].hour = new wchar_t[2];
+		}
+
+		for (int i = 0; i < 2; i++) {
+			cout << "Day of week " << i + 1 << " of the course will performed (MON / TUE / WED / THU / FRI / SAT): ";
+			wcin >> pCur->data.session[i].dayOfWeek;
+			cout << "The session " << i + 1 << " of the course will performed (S1 (07:30), S2 (09:30), S3(13:30) and S4 (15:30)): ";
+			wcin >> pCur->data.session[i].hour;
+		}
+
+		pCur->pNext = nullptr;
+
+		cout << "Enter 0 to stop: ";
+		cin >> temp;
+	}
+
+	pCur->pNext = new _course;
+	pCur = pCur->pNext;
+	pCur->data.session = new session[2];
+	for (int i = 0; i < 2; i++) {
+		pCur->data.session[i].dayOfWeek = new wchar_t[3];
+		pCur->data.session[i].hour = new wchar_t[2];
+	}
+	pCur->pNext = nullptr;
 }
 
 void readCourseFile(_course*& pHead) {
 	string path, fileFormat = ".csv";
-	cout << "Input the name of the file contain sourse's info: ";
+	cout << "Input the name of the file contain course's info: ";
 	cin >> path;
 	path += fileFormat;
 	wifstream fileIn;
@@ -202,6 +265,7 @@ void readCourseFile(_course*& pHead) {
 		pCur->data.credit = wstringToInt(temp);
 		getline(fileIn, temp, a);
 		pCur->data.maxStu = wstringToInt(temp);
+
 		pCur->data.session = new session[2];
 		for (int i = 0; i < 2; i++) {
 			pCur->data.session[i].dayOfWeek = new wchar_t[3];
@@ -220,14 +284,70 @@ void readCourseFile(_course*& pHead) {
 	fileIn.close();
 }
 
-void writeCourseFile(_course* pHead) {
+void writeCourseFile(string path, _course* pHead) {
 	wofstream fileOut;
+	fileOut.open(path, ios_base::out);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
 	while (pHead->pNext != nullptr) {
-		fileOut << pHead->data.courseId << "," << pHead->data.courseName << "," << pHead->data.credit << "," << pHead->data.maxStu << endl;
+		fileOut << pHead->data.courseId << "," << pHead->data.courseName << "," << pHead->data.teacherName << "," << pHead->data.credit << "," << pHead->data.maxStu << ",";
+		fileOut << pHead->data.session[0].dayOfWeek << "," << pHead->data.session[0].hour << ",";
+		fileOut	 << pHead->data.session[1].dayOfWeek << "," << pHead->data.session[1].hour << endl;
 		pHead = pHead->pNext;
 	}
+
 	fileOut.close();
+}
+
+void writeIndividualCourseFile(string path, course pHead) {
+	wofstream fileOut;
+	fileOut.open(path, ios_base::out);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << pHead.courseId << "," << pHead.courseName << "," << pHead.teacherName << "," << pHead.credit << "," << pHead.maxStu << ",";
+	fileOut << pHead.session[0].dayOfWeek << "," << pHead.session[0].hour << ",";
+	fileOut << pHead.session[1].dayOfWeek << "," << pHead.session[1].hour << endl;
+
+	fileOut.close();
+}
+
+void addCourseListFile(string path, course* pHead) {
+	wofstream fileOut;
+	fileOut.open(path, ios_base::app);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << pHead->courseId << endl;
+
+	fileOut.close();
+}
+
+void addIndividualCourseFile(string path, course pHead) {
+	wofstream fileOut;
+	fileOut.open(path, ios_base::app);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << pHead.courseId << "," << pHead.courseName << "," << pHead.teacherName << "," << pHead.credit << "," << pHead.maxStu << ",";
+	fileOut << pHead.session[0].dayOfWeek << "," << pHead.session[0].hour << ",";
+	fileOut << pHead.session[1].dayOfWeek << "," << pHead.session[1].hour << endl;
+
+	fileOut.close();
+}
+
+void displayCourseConsole(_course* pHead) {
+	_LText();
+
+	while (pHead->pNext != nullptr) {
+		wcout << pHead->data.courseId << ",";
+		wcout << pHead->data.courseName << ",";
+		wcout << pHead->data.teacherName << ",";
+		wcout << pHead->data.credit << ",";
+		wcout << pHead->data.maxStu << ",";
+		wcout << pHead->data.session[0].dayOfWeek << "," << pHead->data.session[0].hour << ",";
+		wcout << pHead->data.session[1].dayOfWeek << "," << pHead->data.session[1].hour << endl;
+		pHead = pHead->pNext;
+	}
+
+	_SText();
 }
 
 void createCourse() {

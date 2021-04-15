@@ -30,7 +30,7 @@ struct student {
 	Date Date_Of_Birth;
 	unsigned long long Social_ID;
 
-	//_score* score = nullptr;
+	_score* score = nullptr;
 	_course* course = nullptr;
 
 	double GPA = 0;

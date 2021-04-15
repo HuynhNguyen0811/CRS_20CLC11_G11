@@ -1,8 +1,6 @@
 #include "commonFunc.h"
 #include "graphic.h"
 
-
-
 void drawChoosingOutlineStu(int x, int y) {
 	textColor(3);
 	GotoXY(x, y);
