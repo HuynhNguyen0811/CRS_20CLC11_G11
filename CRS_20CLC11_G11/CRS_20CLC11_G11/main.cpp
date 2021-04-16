@@ -7,24 +7,17 @@
 
 int main()
 {
-	_course* pHead = nullptr;
+	/*_course* pHead = nullptr;
+	course pEdit;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 
-	_mkdir("Data");
-	_mkdir("Data\\Course");
-
-	inputFromKeyboardCourse(pHead);
-	
-	writeCourseFile(FolderPath + coursePath, pHead);
-	
-	while (pHead->pNext != nullptr) {
-		writeIndividualCourseFile(FolderPath + to_string(pHead->data.courseId) + fileFormat, pHead->data);
-		pHead = pHead->pNext;
-	}
+	readCourseFile("Course.csv", pHead);
 
 	displayCourseConsole(pHead);
 
-	deleteListCourse(pHead);
+	deleteListCourse(pHead);*/
+
+	createCourse();
 
 	/*AtTheBeginningOfSchoolYear();
 

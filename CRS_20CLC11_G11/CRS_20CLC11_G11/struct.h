@@ -68,6 +68,7 @@ struct course {
 	int credit;
 	int maxStu = 50;
 	session* session;
+	unsigned long long* studentID;
 };
 struct _course {
 	course data;

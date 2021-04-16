@@ -204,17 +204,19 @@ void inputFromKeyboardCourse(_course*& pHead) {
 
 		pCur->data.session = new session[2];
 		for (int i = 0; i < 2; i++) {
-			pCur->data.session[i].dayOfWeek = new wchar_t[3];
-			pCur->data.session[i].hour = new wchar_t[2];
+			pCur->data.session[i].dayOfWeek = new wchar_t[3 + 1];
+			pCur->data.session[i].hour = new wchar_t[2 + 1];
 		}
 
 		for (int i = 0; i < 2; i++) {
 			cout << "Day of week " << i + 1 << " of the course will performed (MON / TUE / WED / THU / FRI / SAT): ";
 			wcin >> pCur->data.session[i].dayOfWeek;
+			pCur->data.session[i].dayOfWeek[3] = '\0';
 			cout << "The session " << i + 1 << " of the course will performed (S1 (07:30), S2 (09:30), S3(13:30) and S4 (15:30)): ";
 			wcin >> pCur->data.session[i].hour;
+			pCur->data.session[i].hour[2] = '\0';
 		}
-
+		
 		pCur->pNext = nullptr;
 
 		cout << "Enter 0 to stop: ";
@@ -225,24 +227,21 @@ void inputFromKeyboardCourse(_course*& pHead) {
 	pCur = pCur->pNext;
 	pCur->data.session = new session[2];
 	for (int i = 0; i < 2; i++) {
-		pCur->data.session[i].dayOfWeek = new wchar_t[3];
-		pCur->data.session[i].hour = new wchar_t[2];
+		pCur->data.session[i].dayOfWeek = new wchar_t[3 + 1];
+		pCur->data.session[i].hour = new wchar_t[2 + 1];
 	}
 	pCur->pNext = nullptr;
 }
 
-void readCourseFile(_course*& pHead) {
-	string path, fileFormat = ".csv";
-	cout << "Input the name of the file contain course's info: ";
-	cin >> path;
-	path += fileFormat;
+void readCourseFile(string path, _course*& pHead) {
 	wifstream fileIn;
-	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 	fileIn.open(path, ios_base::in);
+	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
 	if (fileIn.fail())
 	{
 		cout << "File is not existed " << endl;
-		createCourse();
+		return;
 	}
 	_course* pCur = nullptr;
 	wstring temp;
@@ -268,8 +267,8 @@ void readCourseFile(_course*& pHead) {
 
 		pCur->data.session = new session[2];
 		for (int i = 0; i < 2; i++) {
-			pCur->data.session[i].dayOfWeek = new wchar_t[3];
-			pCur->data.session[i].hour = new wchar_t[2];
+			pCur->data.session[i].dayOfWeek = new wchar_t[3 + 1];
+			pCur->data.session[i].hour = new wchar_t[2 + 1];
 		}
 		getline(fileIn, temp, a);
 		wstringToWchar(pCur->data.session[0].dayOfWeek, temp);
@@ -279,16 +278,23 @@ void readCourseFile(_course*& pHead) {
 		wstringToWchar(pCur->data.session[1].dayOfWeek, temp);
 		getline(fileIn, temp, b);
 		wstringToWchar(pCur->data.session[1].hour, temp);
+
+		for (int i = 0; i < 2; i++) {
+			pCur->data.session[i].dayOfWeek[3] = '\0';
+			pCur->data.session[i].hour[2] = '\0';
+		}
+
 		pCur->pNext = nullptr;
 	}
 	fileIn.close();
 }
 
 void writeCourseFile(string path, _course* pHead) {
+	if (pHead == nullptr) return;
 	wofstream fileOut;
 	fileOut.open(path, ios_base::out);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-
+	
 	while (pHead->pNext != nullptr) {
 		fileOut << pHead->data.courseId << "," << pHead->data.courseName << "," << pHead->data.teacherName << "," << pHead->data.credit << "," << pHead->data.maxStu << ",";
 		fileOut << pHead->data.session[0].dayOfWeek << "," << pHead->data.session[0].hour << ",";
@@ -311,12 +317,12 @@ void writeIndividualCourseFile(string path, course pHead) {
 	fileOut.close();
 }
 
-void addCourseListFile(string path, course* pHead) {
+void addCourseListFile(string path, course pHead) { //khong dung
 	wofstream fileOut;
 	fileOut.open(path, ios_base::app);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
-	fileOut << pHead->courseId << endl;
+	fileOut << pHead.courseId << endl;
 
 	fileOut.close();
 }
@@ -333,21 +339,36 @@ void addIndividualCourseFile(string path, course pHead) {
 	fileOut.close();
 }
 
+void writeAllIndividualCourseFile(string path, _course* pHead) {
+	string FolderPath = "Data\\Course\\", fileFormat = ".csv";
+	while (pHead->pNext != nullptr) {
+		writeIndividualCourseFile(FolderPath + to_string(pHead->data.courseId) + fileFormat, pHead->data);
+		pHead = pHead->pNext;
+	}
+}
+
 void displayCourseConsole(_course* pHead) {
 	_LText();
 
 	while (pHead->pNext != nullptr) {
-		wcout << pHead->data.courseId << ",";
-		wcout << pHead->data.courseName << ",";
-		wcout << pHead->data.teacherName << ",";
-		wcout << pHead->data.credit << ",";
-		wcout << pHead->data.maxStu << ",";
-		wcout << pHead->data.session[0].dayOfWeek << "," << pHead->data.session[0].hour << ",";
-		wcout << pHead->data.session[1].dayOfWeek << "," << pHead->data.session[1].hour << endl;
+		wcout << pHead->data.courseId << " ";
+		wcout << pHead->data.courseName << " ";
+		wcout << pHead->data.teacherName << " ";
+		wcout << pHead->data.credit << " ";
+		wcout << pHead->data.maxStu << " ";
+		wcout << pHead->data.session[0].dayOfWeek << "-" << pHead->data.session[0].hour << " ";
+		wcout << pHead->data.session[1].dayOfWeek << "-" << pHead->data.session[1].hour << endl;
 		pHead = pHead->pNext;
 	}
 
 	_SText();
+}
+
+course findCourse(unsigned long long ID, _course* pHead) {
+	while (pHead != nullptr) {
+		if (pHead->data.courseId == ID) return pHead->data;
+		pHead = pHead->pNext;
+	}
 }
 
 void createCourseFromKeyboard() {
@@ -359,14 +380,11 @@ void createCourseFromKeyboard() {
 
 	inputFromKeyboardCourse(pHead);
 
+	//displayCourseConsole(pHead);
+
 	writeCourseFile(FolderPath + coursePath, pHead);
 
-	while (pHead->pNext != nullptr) {
-		writeIndividualCourseFile(FolderPath + to_string(pHead->data.courseId) + fileFormat, pHead->data);
-		pHead = pHead->pNext;
-	}
-
-	displayCourseConsole(pHead);
+	writeAllIndividualCourseFile("", pHead);
 
 	deleteListCourse(pHead);
 }
@@ -378,16 +396,75 @@ void createCourseFromFile() {
 	_mkdir("Data");
 	_mkdir("Data\\Course");
 
-	readCourseFile(pHead);
+	string path;
+
+	cout << "Input the name of the file contain course's info: ";
+	cin >> path;
+	path += fileFormat;
+
+	ifstream fileIn; 
+	fileIn.open(path, ios_base::in);
+	if (fileIn.fail())
+	{
+		cout << "File is not existed " << endl;
+		fileIn.close();
+		return;
+	}
+
+	readCourseFile(path, pHead);
 
 	writeCourseFile(FolderPath + coursePath, pHead);
 
-	while (pHead->pNext != nullptr) {
-		writeIndividualCourseFile(FolderPath + to_string(pHead->data.courseId) + fileFormat, pHead->data);
-		pHead = pHead->pNext;
-	}
+	writeAllIndividualCourseFile("", pHead);
+
+	//displayCourseConsole(pHead);
+
+	deleteListCourse(pHead);
+}
+
+void editCourse() {
+	_course* pHead = nullptr;
+	course pEdit;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+
+	readCourseFile(FolderPath + coursePath, pHead);
 
 	displayCourseConsole(pHead);
+
+	unsigned long long tempID;
+	cout << "Enter the ID of the course you want to edit: ";
+	cin >> tempID;
+
+	pEdit = findCourse(tempID, pHead);
+
+	cin.ignore(1000, '\n');
+
+	_LText();
+
+	wcout << "Course's name: ";
+	std::getline(wcin, pEdit.courseName, L'\n');
+	wcout << "Teacher's name: ";
+	std::getline(wcin, pEdit.teacherName, L'\n');
+
+	_SText();
+
+	cout << "Number of credits: ";
+	cin >> pEdit.credit;
+	cout << "Course's max student: ";
+	cin >> pEdit.credit;
+
+	for (int i = 0; i < 2; i++) {
+		cout << "Day of week " << i + 1 << " of the course will performed (MON / TUE / WED / THU / FRI / SAT): ";
+		wcin >> pEdit.session[i].dayOfWeek;
+		pEdit.session[i].dayOfWeek[3] = '\0';
+		cout << "The session " << i + 1 << " of the course will performed (S1 (07:30), S2 (09:30), S3(13:30) and S4 (15:30)): ";
+		wcin >> pEdit.session[i].hour;
+		pEdit.session[i].hour[2] = '\0';
+	}
+
+	writeCourseFile(FolderPath + coursePath, pHead);
+
+	writeAllIndividualCourseFile("", pHead);
 
 	deleteListCourse(pHead);
 }
@@ -395,7 +472,7 @@ void createCourseFromFile() {
 void createCourse() {
 	int flag = -1;
 	while (flag != 0) {
-		cout << "1. Input course from keyboard\n2. Input course from file .csv\n0. Escape\n";
+		cout << "1. Input course from keyboard\n2. Input course from file .csv\n3. Edit course's information\n0. Escape\n";
 		cin >> flag;
 		switch (flag) {
 		case 1:
@@ -403,6 +480,9 @@ void createCourse() {
 			break;
 		case 2:
 			createCourseFromFile();
+			break;
+		case 3:
+			editCourse();
 			break;
 		default:
 			break;
