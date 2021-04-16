@@ -62,6 +62,7 @@ void createClassListFile(string path, string className) {
 
 	fileOut.close();
 }
+
 void AtTheBeginningOfSchoolYear() {
 	system("CLS");
 	//SchoolYear sy;
@@ -131,7 +132,7 @@ void AtTheBeginningOfSchoolYear() {
 		menuStaff();
 		break;
 	default:
-		menuStaff();
+		//menuStaff();
 		break;
 	}
 }

@@ -69,6 +69,7 @@ void createLogInStudent(string path, _student* pHead, string classname) {
 		else pass += to_string(pHead->data.Date_Of_Birth.month);
 		pass += to_string(pHead->data.Date_Of_Birth.year);
 
+		cout << pass << endl;
 		fileOut << pass << ",";
 		fileOut << classname << endl;
 

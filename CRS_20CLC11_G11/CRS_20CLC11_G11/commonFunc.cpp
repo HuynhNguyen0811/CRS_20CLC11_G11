@@ -126,7 +126,13 @@ Date wstringToDate(wstring str) {
 }
 
 void wstringToWchar(wchar_t* destination, wstring source) {
-	for (int i = 0; i < source.size(); i++) {
+	for (int i = 0; i < source.size() + 1; i++) {
+		destination[i] = source[i];
+	}
+}
+
+void stringToChar(char* destination, string source) {
+	for (int i = 0; i < source.size() + 1; i++) {
 		destination[i] = source[i];
 	}
 }

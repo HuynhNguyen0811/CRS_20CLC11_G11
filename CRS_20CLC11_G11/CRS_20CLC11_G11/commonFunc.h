@@ -29,5 +29,6 @@ unsigned long long wstringToLong(wstring str);
 Date wstringToDate(wstring str);
 
 void wstringToWchar(wchar_t* destination, wstring source);
+void stringToChar(char* destination, string source);
 
 #endif
