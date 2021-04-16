@@ -5,6 +5,7 @@
 
 struct student;
 struct _student;
+struct _studentRegis;
 struct Class;
 struct _Class;
 struct semester;
@@ -40,6 +41,11 @@ struct _student {
 	_student* pNext, * pPrevious;
 };
 
+struct _studentRegis {
+	unsigned long long data;
+	_studentRegis* pNext;
+};
+
 struct Class {
 	std::string name;
 	_student* student;
@@ -68,7 +74,7 @@ struct course {
 	int credit;
 	int maxStu = 50;
 	session* session;
-	unsigned long long* studentID;
+	_studentRegis* studentID = nullptr;
 };
 struct _course {
 	course data;

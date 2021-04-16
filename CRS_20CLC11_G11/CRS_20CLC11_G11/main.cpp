@@ -7,16 +7,6 @@
 
 int main()
 {
-	/*_course* pHead = nullptr;
-	course pEdit;
-	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
-
-	readCourseFile("Course.csv", pHead);
-
-	displayCourseConsole(pHead);
-
-	deleteListCourse(pHead);*/
-
 	createCourse();
 
 	/*AtTheBeginningOfSchoolYear();
