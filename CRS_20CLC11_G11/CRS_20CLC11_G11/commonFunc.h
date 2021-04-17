@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include <string>
 
+#include <cmath>
+
 #include<io.h> //utf
 #include <fcntl.h>
 

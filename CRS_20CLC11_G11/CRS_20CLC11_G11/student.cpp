@@ -2,30 +2,30 @@
 #include "staff.h"
 #include "commonFunc.h"
 
-void menuStudent(unsigned long long& ID, string className) {
-	system("CLS");
-	int flag = -1;
-	while (flag != 0) {
-		cout << "\n1.Check your profile\n2.Manage course\n3.Change password\n4.Log out\n0.Escape";
-		cin >> flag;
-		switch (flag) {
-		case 1:
-			findAndPrintStudent(ID, className);
-			break;
-		case 2:
-			break;
-		case 3:
-			changePassword(ID, className);
-			break;
-		case 4:
-			ID = NULL;
-			login(ID, className);
-			break;
-		default:
-			break;
-		}
-	}
-}
+//void menuStudent(unsigned long long& ID, string className) {
+//	system("CLS");
+//	int flag = -1;
+//	while (flag != 0) {
+//		cout << "\n1.Check your profile\n2.Manage course\n3.Change password\n4.Log out\n0.Escape";
+//		cin >> flag;
+//		switch (flag) {
+//		case 1:
+//			findAndPrintStudent(ID, className);
+//			break;
+//		case 2:
+//			break;
+//		case 3:
+//			changePassword(ID, className);
+//			break;
+//		case 4:
+//			ID = NULL;
+//			login(ID, className);
+//			break;
+//		default:
+//			break;
+//		}
+//	}
+//}
 
 void login(unsigned long long& ID, string& className) {
 	system("CLS");
@@ -116,6 +116,7 @@ void findAndPrintStudent(unsigned long long ID, string className) {
 
 void printInfoStudent(student stu) {
 	_LText();
+
 	wcout << "Number in class: " << stu.No << endl;
 	wcout << "ID: " << stu.Student_ID << endl;
 	wcout << "First Name: " << stu.FirstName << endl;
@@ -123,6 +124,7 @@ void printInfoStudent(student stu) {
 	wcout << "Sex: " << stu.Gender << endl;
 	wcout << "Date of birth: " << stu.Date_Of_Birth.day << "/" << stu.Date_Of_Birth.month << "/" << stu.Date_Of_Birth.year << endl;
 	wcout << "Social ID: " << stu.Social_ID << endl;
+
 	_SText();
 }
 
@@ -168,7 +170,7 @@ void changePassword(unsigned long long ID, string className) {
 	editFilePassword("Data\\Classes\\passStudent.csv", ID, className, newPassword);
 	cout << "Change successfully\n";
 	system("PAUSE");
-	menuStudent(ID, className);
+	return;
 }
 
 
@@ -182,79 +184,195 @@ void changePassword(unsigned long long ID, string className) {
 
 //note: build lai struct score
 
-//student findInfoStudent(unsigned long long ID, string className) {
-//	
-//}
-//
-//student findStudent(unsigned long long ID, string className) {
-//	wifstream fileIn;
-//	string folderName = "Data\\Classes\\";
-//	string fileFormat = ".csv";
-//
-//	string path = folderName + className + fileFormat;
-//	fileIn.open(path, ios_base::in);
-//	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-//
-//	student stu;
-//	wstring temp, tempID, tempDate;
-//	wchar_t a = ',', b = '\n';
-//	while (fileIn) {
-//		getline(fileIn, temp, a);
-//		getline(fileIn, tempID, a);
-//		stu.No = wstringToInt(temp);
-//		stu.Student_ID = wstringToLong(tempID);
-//		getline(fileIn, stu.FirstName, a);
-//		getline(fileIn, stu.LastName, a);
-//		getline(fileIn, stu.Gender, a);
-//		getline(fileIn, tempDate, a);
-//		stu.Date_Of_Birth = wstringToDate(tempDate);
-//		fileIn >> stu.Social_ID;
-//
-//		if (stu.Student_ID == ID) break;
-//	}
-//	fileIn.close();
-//	return stu; 
-//}
-//
-//void createStudentFile(student stu, string className) {
-//	
-//	string folderName = "Data\\Classes\\", fileFormat = ".csv";
-//	char* path = new char[(folderName + className).size() + 1];
-//	stringToChar(path, folderName + className);
-//	_mkdir(path);
-//	wofstream fileOut;
-//	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::in);
-//	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-//
-//	fileOut << stu.No << L"," << stu.Student_ID << L"," << stu.FirstName << L"," << stu.LastName << L"," << stu.Gender << L"," << stu.Date_Of_Birth.day << wchar_t(47) << stu.Date_Of_Birth.month << wchar_t(47) << stu.Date_Of_Birth.year << L"," << stu.Social_ID << endl;
-//
-//	fileOut.close();
-//}
-//
-//void menuStudent(unsigned long long ID, string className) {
-//	int flag = -1;
-//	// find student & return student
-//	
-//	// create separate file for that specific student
-//
-//	//create time table
-//
-//	//menu
-//	while (flag != 0) {
-//		cout << "1. View info\n2. Manage course\n3. Change password\n4. Log out\n";
-//		cin >> flag;
-//
-//	}
-//
-//	//option 1: view info
-//
-//	//option 2: manage course
-//	//view enroll course
-//	//regis course
-//	//delete course
-//
-//	//option 3: change pass
-//
-//	//option 4: logout (just break)
-//
-//}
+
+
+student findInfoStudent(unsigned long long ID, string className) {
+	string folderName = "Data\\Classes\\", fileFormat = ".csv";
+	wifstream fileIn;
+	fileIn.open(folderName + className + "\\" + to_string(ID) + fileFormat, ios_base::in);
+	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+	student stu;
+	if (fileIn.fail()) { //lan dau dang nhap, chua co san file rieng
+		return stu;
+	} 
+	//co san file rieng
+
+	wchar_t a = ',', b = '\n';
+	wstring temp;
+	getline(fileIn, temp, a);
+	stu.No = wstringToInt(temp);
+	getline(fileIn, temp, a);
+	stu.Student_ID = wstringToLong(temp);
+	getline(fileIn, stu.FirstName, a);
+	getline(fileIn, stu.LastName, a);
+	getline(fileIn, stu.Gender, a);
+	getline(fileIn, temp, a);
+	stu.Date_Of_Birth = wstringToDate(temp);
+	fileIn >> stu.Social_ID;
+
+	fileIn.ignore(1000, L' ');
+	_course* pCurCourse = nullptr;
+	for (int i = 0; i < 5; i++) {
+
+		getline(fileIn, temp, a);
+		if (temp.size() == 0) break;
+
+		if (stu.course == nullptr) {
+			stu.course = new _course;
+			pCurCourse = stu.course;
+		}
+		else {
+			pCurCourse->pNext = new _course;
+			pCurCourse = pCurCourse->pNext;
+		}
+
+		pCurCourse->data.courseId = wstringToLong(temp);
+		pCurCourse->pNext = nullptr;
+		
+	}
+
+	_score* pCurScore = nullptr;
+	while (fileIn) {
+		if (stu.score == nullptr) {
+			stu.score = new _score;
+			pCurScore = stu.score;
+		} else {
+			pCurScore->pNext = new _score;
+			pCurScore = pCurScore->pNext;
+		}
+
+		fileIn >> pCurScore->data.course_ID >> a;
+		fileIn >> pCurScore->data.total >> a;
+		fileIn >> pCurScore->data.final >> a;
+		fileIn >> pCurScore->data.mid >> a;
+		fileIn >> pCurScore->data.other >> a;
+		fileIn >> pCurScore->data.gpa >> b;
+
+		pCurScore->pNext = nullptr;
+	}
+
+	fileIn.close();
+	return stu;
+}
+
+student findStudent(unsigned long long ID, string className) {
+	wifstream fileIn;
+	string folderName = "Data\\Classes\\";
+	string fileFormat = ".csv";
+
+	string path = folderName + className + fileFormat;
+	fileIn.open(path, ios_base::in);
+	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	student stu;
+	wstring temp, tempID, tempDate;
+	wchar_t a = ',', b = '\n';
+	while (fileIn) {
+		getline(fileIn, temp, a);
+		getline(fileIn, tempID, a);
+		stu.No = wstringToInt(temp);
+		stu.Student_ID = wstringToLong(tempID);
+		getline(fileIn, stu.FirstName, a);
+		getline(fileIn, stu.LastName, a);
+		getline(fileIn, stu.Gender, a);
+		getline(fileIn, tempDate, a);
+		stu.Date_Of_Birth = wstringToDate(tempDate);
+		fileIn >> stu.Social_ID;
+
+		if (stu.Student_ID == ID) break;
+	}
+	fileIn.close();
+	return stu; 
+}
+
+void readExistedFile(string path, student stu) {
+
+}
+
+void createStudentFile(student stu, string className) {
+	
+	string folderName = "Data\\Classes\\", fileFormat = ".csv";
+	char* path = new char[(folderName + className).size() + 1];
+	stringToChar(path, folderName + className);
+	_mkdir(path);
+	wofstream fileOut;
+	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::out);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << stu.No << L"," << stu.Student_ID << L"," << stu.FirstName << L"," << stu.LastName << L"," << stu.Gender << L"," << stu.Date_Of_Birth.day << wchar_t(47) << stu.Date_Of_Birth.month << wchar_t(47) << stu.Date_Of_Birth.year << L"," << stu.Social_ID << endl;
+
+	fileOut.close();
+}
+
+void menuManageStudent(student stu, string className) {
+	int flag = -1;
+
+	while (flag != 0) {
+		system("CLS");
+		cout << "1. Enroll course\n2. View enrolled course\n3. View scoreboard\n0. Back to main menu\n";
+		cin >> flag;
+
+		switch (flag) {
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		default:
+			break;
+		}
+	
+	}
+}
+
+void menuStudent(unsigned long long ID, string className) {
+	int flag = -1;
+
+	// find student & return student
+	findInfoStudent(ID, className);
+
+	// create separate file for that specific student
+	student stu;
+	stu = findStudent(ID, className);
+	createStudentFile(stu, className);
+
+	//create time table
+
+	//menu
+	while (flag != 0) {
+		system("CLS");
+		cout << "1. View info\n2. Manage course\n3. Change password\n4. Log out\n0. Escape\n";
+		cin >> flag;
+		switch (flag) {
+		case 1:
+			printInfoStudent(stu);
+			break;
+		case 2:
+
+			break;
+		case 3: 
+			changePassword(ID, className);
+			break;
+		case 4: 
+
+			break;
+		default: 
+			break;
+		}
+	}
+
+	//option 1: view info
+
+	//option 2: manage course
+	//view enroll course
+	//regis course
+	//delete course
+
+	//option 3: change pass
+
+	//option 4: logout (just break)
+
+}

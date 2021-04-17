@@ -183,7 +183,6 @@ void inputFromKeyboardCourse(_course*& pHead) {
 		if (pHead == nullptr) {
 			pHead = new _course;
 			pCur = pHead;
-			pHead->pPrevious = nullptr;
 		}
 		else {
 			pCur->pNext = new _course;
@@ -226,6 +225,9 @@ void inputFromKeyboardCourse(_course*& pHead) {
 			wcin >> pCur->data.session[i].hour;
 			pCur->data.session[i].hour[2] = '\0';
 		}
+		string temp;
+		cout << "Start registration date: "; cin >> temp; pCur->data.startRegis = stringToDate(temp);
+		cout << "End registration date: "; cin >> temp; pCur->data.endRegis = stringToDate(temp);
 		
 		pCur->pNext = nullptr;
 
@@ -260,7 +262,6 @@ void readCourseFile(string path, _course*& pHead) {
 		if (pHead == nullptr) {
 			pHead = new _course;
 			pCur = pHead;
-			pHead->pPrevious = nullptr;
 		}
 		else {
 			pCur->pNext = new _course;
@@ -280,19 +281,20 @@ void readCourseFile(string path, _course*& pHead) {
 			pCur->data.session[i].dayOfWeek = new wchar_t[3 + 1];
 			pCur->data.session[i].hour = new wchar_t[2 + 1];
 		}
-		getline(fileIn, temp, a);
-		wstringToWchar(pCur->data.session[0].dayOfWeek, temp);
-		getline(fileIn, temp, a);
-		wstringToWchar(pCur->data.session[0].hour, temp);
-		getline(fileIn, temp, a);
-		wstringToWchar(pCur->data.session[1].dayOfWeek, temp);
-		getline(fileIn, temp, b);
-		wstringToWchar(pCur->data.session[1].hour, temp);
 
 		for (int i = 0; i < 2; i++) {
+			getline(fileIn, temp, a);
+			wstringToWchar(pCur->data.session[i].dayOfWeek, temp);
+			getline(fileIn, temp, a);
+			wstringToWchar(pCur->data.session[i].hour, temp);
 			pCur->data.session[i].dayOfWeek[3] = '\0';
 			pCur->data.session[i].hour[2] = '\0';
 		}
+
+		getline(fileIn, temp, a);
+		pCur->data.startRegis = wstringToDate(temp);
+		getline(fileIn, temp, b);
+		pCur->data.endRegis = wstringToDate(temp);
 
 		pCur->pNext = nullptr;
 	}
@@ -340,7 +342,9 @@ void writeCourseFile(string path, _course* pHead) {
 	while (pHead->pNext != nullptr) {
 		fileOut << pHead->data.courseId << "," << pHead->data.courseName << "," << pHead->data.teacherName << "," << pHead->data.credit << "," << pHead->data.maxStu << ",";
 		fileOut << pHead->data.session[0].dayOfWeek << "," << pHead->data.session[0].hour << ",";
-		fileOut	 << pHead->data.session[1].dayOfWeek << "," << pHead->data.session[1].hour << endl;
+		fileOut	 << pHead->data.session[1].dayOfWeek << "," << pHead->data.session[1].hour << ",";
+		fileOut << pHead->data.startRegis.day << L"/" << pHead->data.startRegis.month << L"/" << pHead->data.startRegis.year << ",";
+		fileOut << pHead->data.endRegis.day << L"/" << pHead->data.endRegis.month << L"/" << pHead->data.endRegis.year << endl;
 		pHead = pHead->pNext;
 	}
 
@@ -354,7 +358,9 @@ void writeIndividualCourseFile(string path, course pHead) {
 
 	fileOut << pHead.courseId << "," << pHead.courseName << "," << pHead.teacherName << "," << pHead.credit << "," << pHead.maxStu << ",";
 	fileOut << pHead.session[0].dayOfWeek << "," << pHead.session[0].hour << ",";
-	fileOut << pHead.session[1].dayOfWeek << "," << pHead.session[1].hour << endl;
+	fileOut << pHead.session[1].dayOfWeek << "," << pHead.session[1].hour << ",";
+	fileOut << pHead.startRegis.day << L"/" << pHead.startRegis.month << L"/" << pHead.startRegis.year << ",";
+	fileOut << pHead.endRegis.day << L"/" << pHead.endRegis.month << L"/" << pHead.endRegis.year << endl;
 
 	_studentRegis* pCur = pHead.studentID;
 	while (pCur != nullptr && pCur->pNext != nullptr) {
@@ -382,7 +388,9 @@ void addIndividualCourseFile(string path, course pHead) {
 
 	fileOut << pHead.courseId << "," << pHead.courseName << "," << pHead.teacherName << "," << pHead.credit << "," << pHead.maxStu << ",";
 	fileOut << pHead.session[0].dayOfWeek << "," << pHead.session[0].hour << ",";
-	fileOut << pHead.session[1].dayOfWeek << "," << pHead.session[1].hour << endl;
+	fileOut << pHead.session[1].dayOfWeek << "," << pHead.session[1].hour << ",";
+	fileOut << pHead.startRegis.day << L"/" << pHead.startRegis.month << L"/" << pHead.startRegis.year << ",";
+	fileOut << pHead.endRegis.day << L"/" << pHead.endRegis.month << L"/" << pHead.endRegis.year << endl;
 
 	fileOut.close();
 }
@@ -407,7 +415,9 @@ void displayCourseConsole(_course* pHead) {
 		wcout << pHead->data.credit << " ";
 		wcout << pHead->data.maxStu << " ";
 		wcout << pHead->data.session[0].dayOfWeek << "-" << pHead->data.session[0].hour << " ";
-		wcout << pHead->data.session[1].dayOfWeek << "-" << pHead->data.session[1].hour << endl;
+		wcout << pHead->data.session[1].dayOfWeek << "-" << pHead->data.session[1].hour << " ";
+		wcout << pHead->data.startRegis.day << L"/" << pHead->data.startRegis.month << L"/" << pHead->data.startRegis.year << " ";
+		wcout << pHead->data.endRegis.day << L"/" << pHead->data.endRegis.month << L"/" << pHead->data.endRegis.year << endl;
 		pHead = pHead->pNext;
 	}
 
@@ -425,6 +435,9 @@ void displayIndividualCourseConsole(course pHead) {
 	wcout << pHead.session[0].dayOfWeek << "-" << pHead.session[0].hour;
 	wcout << " ";
 	wcout << pHead.session[1].dayOfWeek << "-" << pHead.session[1].hour;
+	wcout << " ";
+	wcout << pHead.startRegis.day << L"/" << pHead.startRegis.month << L"/" << pHead.startRegis.year << " ";
+	wcout << pHead.endRegis.day << L"/" << pHead.endRegis.month << L"/" << pHead.endRegis.year << endl;
 
 	_SText();
 

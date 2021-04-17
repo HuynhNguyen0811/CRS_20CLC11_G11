@@ -75,19 +75,21 @@ struct course {
 	int maxStu = 50;
 	session* session;
 	_studentRegis* studentID = nullptr;
+	Date startRegis, endRegis;
 };
 struct _course {
 	course data;
-	_course* pNext, * pPrevious;
+	_course* pNext;
 };
 
 struct score {
-	course data;
-	double mark;
+	unsigned long long course_ID;
+	double total, final, mid, other, gpa;
 };
+
 struct _score {
 	score data;
-	_score* pNext, * pPrevious;
+	_score* pNext;
 };
 
 struct account {

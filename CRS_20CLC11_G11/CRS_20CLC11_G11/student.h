@@ -4,7 +4,7 @@
 #include "bigData.h"
 #include "struct.h"
 
-void menuStudent(unsigned long long& ID, string className);
+void menuStudent(unsigned long long ID, string className);
 void login(unsigned long long& ID, string& className);
 bool checkLogin(string path, unsigned long long ID, string password, string& className);
 void printInfoStudent(student stu);
