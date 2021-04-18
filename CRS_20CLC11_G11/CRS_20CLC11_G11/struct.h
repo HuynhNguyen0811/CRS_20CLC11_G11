@@ -32,7 +32,7 @@ struct student {
 	unsigned long long Social_ID;
 
 	_score* score = nullptr;
-	_course* course = nullptr;
+	//_course* course = nullptr;
 
 	double GPA = 0;
 };
@@ -84,7 +84,7 @@ struct _course {
 
 struct score {
 	unsigned long long course_ID;
-	double total, final, mid, other, gpa;
+	double total = 0, final = 0, mid = 0, other = 0, gpa = 0;
 };
 
 struct _score {
