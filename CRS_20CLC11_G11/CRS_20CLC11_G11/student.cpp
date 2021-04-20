@@ -2,17 +2,6 @@
 #include "staff.h"
 #include "commonFunc.h"
 
-
-void deleteLastScore(student stu) {
-	_score* pCur = stu.score;
-	while (pCur != nullptr && pCur->pNext != nullptr) pCur = pCur->pNext;
-	if (pCur != nullptr) {
-		_score* pTemp = pCur->pNext;
-		delete pTemp;
-		pCur->pNext = nullptr;
-	}
-}
-
 //void menuStudent(unsigned long long& ID, string className) {
 //	system("CLS");
 //	int flag = -1;
@@ -141,7 +130,12 @@ void printInfoStudent(student stu) {
 
 void printScoreboard(student stu) {
 	while (stu.score != nullptr && stu.score->pNext != nullptr) {
-		cout << stu.score->data.course_ID << " " << stu.score->data.total << " " << stu.score->data.final << " " << stu.score->data.mid << " " << stu.score->data.other << " " << stu.score->data.gpa << endl;
+		cout << stu.score->data.course_ID << " ";
+		cout << stu.score->data.total << " ";
+		cout << stu.score->data.final << " ";
+		cout << stu.score->data.mid << " ";
+		cout << stu.score->data.other << " ";
+		cout << stu.score->data.gpa << endl;
 		stu.score = stu.score->pNext;
 	}
 }
@@ -190,12 +184,6 @@ void changePassword(unsigned long long ID, string className) {
 	system("PAUSE");
 	return;
 }
-
-
-
-
-
-
 
 //code lai tu dau
 //file sinh vien, info dong dau, nhung dong ke tiep thi moi dong 1 khoa cung voi diem cua khoa do, chua co thi mac dinh la 0
@@ -256,7 +244,9 @@ student findInfoStudent(unsigned long long ID, string className) {
 
 		pCurScore->pNext = nullptr;
 	}
+
 	printScoreboard(stu);
+
 	fileIn.close();
 	return stu;
 }
@@ -312,8 +302,86 @@ void createStudentFile(student stu, string className) {
 	fileOut.close();
 }
 
-void menuManageStudent(student stu, string className) {
+bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse) {
+	while (pHeadCourse != nullptr) {
+		if (pHeadCourse->data.courseId == tempID) return 1;
+		pHeadCourse = pHeadCourse->pNext;
+	}
+	return 0;
+}
+
+void addEnrolledCourse(student stu, string className, unsigned long long course_ID) {
+	string folderName = "Data\\Classes\\", fileFormat = ".csv";
+	wofstream fileOut;
+	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::app);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << course_ID << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << endl;
+
+	fileOut.close();
+}
+
+_score* takeTailEnrollCourse(student stu) {
+	_score* pCur = stu.score;
+	while (pCur != nullptr && pCur->pNext != nullptr) {
+		pCur = pCur->pNext;
+	}
+	return pCur;
+}
+
+void enrollCourse(student& stu, string className, _course* pHeadCourse) {
+	cout << "Course's information list: " << endl;
+	displayCourseConsole(pHeadCourse);
+
+	int temp = -1;
+	unsigned long long tempID;
+	_score* pCur = takeTailEnrollCourse(stu);
+	while (temp != 0) {
+		cout << "Input the course's ID you want to enroll: ";
+		cin >> tempID;
+		if (checkEnrollCourse(tempID, pHeadCourse)) {
+			if (stu.score == nullptr) {
+				stu.score = new _score;
+				pCur = stu.score;
+			}
+			else {
+				pCur->pNext = new _score;
+				pCur = pCur->pNext;
+			}
+			pCur->data.course_ID = tempID;
+			pCur->pNext = nullptr;
+
+			addEnrolledCourse(stu, className, tempID);
+		}
+		else cout << "Invalid choice\n";
+		cout << "Enter '0' to escape: ";
+		cin >> temp;
+	}
+}
+
+void viewEnrollCourse(student stu, _course* pHeadCourse) {
+	cout << "Enrolled course: " << endl;
+
+	_course* pDisplay = nullptr;
+	_score* pCur = stu.score;
+
+	while (pHeadCourse != nullptr) {
+		while (pCur != nullptr) {
+			if (pCur->data.course_ID == pHeadCourse->data.courseId) displayIndividualCourseConsole(pHeadCourse->data);
+			pCur = pCur->pNext;
+		}
+		pCur = stu.score;
+		pHeadCourse = pHeadCourse->pNext;
+	}
+}
+
+void menuManageCourseStudent(student stu, string className) {
 	int flag = -1;
+	//load toan bo course hien co
+	_course* pHeadCourse = nullptr, * pEdit;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+
+	readCourseFile(FolderPath + coursePath, pHeadCourse);
 
 	while (flag != 0) {
 		system("CLS");
@@ -322,10 +390,16 @@ void menuManageStudent(student stu, string className) {
 
 		switch (flag) {
 		case 1:
+			enrollCourse(stu, className, pHeadCourse);
+			system("PAUSE");
 			break;
 		case 2:
+			viewEnrollCourse(stu, pHeadCourse);
+			system("PAUSE");
 			break;
 		case 3:
+			printScoreboard(stu);
+			system("PAUSE");
 			break;
 		default:
 			break;
@@ -358,7 +432,7 @@ void menuStudent(unsigned long long ID, string className) {
 			system("PAUSE");
 			break;
 		case 2:
-			menuManageStudent(stu, className);
+			menuManageCourseStudent(stu, className);
 			system("PAUSE");
 			break;
 		case 3: 

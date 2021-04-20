@@ -4,8 +4,6 @@
 #include "bigData.h"
 #include "struct.h"
 
-void deleteLastScore(student stu);
-
 student findInfoStudent(unsigned long long ID, string className);
 student findStudent(unsigned long long ID, string className);
 
@@ -19,7 +17,12 @@ bool checkLogin(string path, unsigned long long ID, string password, string& cla
 
 void login(unsigned long long& ID, string& className);
 
-void menuManageStudent(student stu, string className);
+void addEnrolledCourse(student stu, string className, unsigned long long course_ID);
+
+void enrollCourse(student& stu, string className, _course* pHeadCourse);
+void viewEnrollCourse(student stu, _course* pHeadCourse);
+
+void menuManageCourseStudent(student stu, string className);
 void menuStudent(unsigned long long ID, string className);
 
 #endif

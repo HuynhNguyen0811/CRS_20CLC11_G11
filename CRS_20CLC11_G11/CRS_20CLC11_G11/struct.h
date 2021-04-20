@@ -75,7 +75,7 @@ struct course {
 	int maxStu = 50;
 	session* session;
 	_studentRegis* studentID = nullptr;
-	Date startRegis, endRegis;
+	Date startRegis = { 0, 0, 0 }, endRegis = { 0, 0, 0 };
 };
 struct _course {
 	course data;

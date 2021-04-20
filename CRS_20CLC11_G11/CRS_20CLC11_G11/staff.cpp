@@ -225,9 +225,9 @@ void inputFromKeyboardCourse(_course*& pHead) {
 			wcin >> pCur->data.session[i].hour;
 			pCur->data.session[i].hour[2] = '\0';
 		}
-		string temp;
-		cout << "Start registration date: "; cin >> temp; pCur->data.startRegis = stringToDate(temp);
-		cout << "End registration date: "; cin >> temp; pCur->data.endRegis = stringToDate(temp);
+		//string temp;
+		//cout << "Start registration date: "; cin >> temp; pCur->data.startRegis = stringToDate(temp);
+		//cout << "End registration date: "; cin >> temp; pCur->data.endRegis = stringToDate(temp);
 		
 		pCur->pNext = nullptr;
 
@@ -517,7 +517,7 @@ void editCourse() {
 	readCourseFile(FolderPath + coursePath, pHead);
 	readAllIndividualCourseFile(FolderPath, pHead);
 
-	cout << "Course'sinformation list: " << endl;
+	cout << "Course's information list: " << endl;
 	displayCourseConsole(pHead);
 
 	unsigned long long tempID;
