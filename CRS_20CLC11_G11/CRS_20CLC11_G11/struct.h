@@ -33,7 +33,7 @@ struct student {
 
 	_score* score = nullptr;
 	//_course* course = nullptr;
-	bool** timeTable = nullptr;
+	int** timeTable = nullptr;
 };
 struct _student {
 	student data;

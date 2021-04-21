@@ -339,6 +339,46 @@ bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse) {
 	return 0;
 }
 
+void createTimetable(student& stu, _course* pHeadCourse) {
+	stu.timeTable = new int* [4];
+	for (int i = 0; i < 4; i++) stu.timeTable[i] = new int[7];
+
+	for (int i = 0; i < 4; i++) {
+		for (int j = 0; j < 7; j++) {
+			stu.timeTable[i][j] = 0;
+		}
+	}
+
+	_score* pCur = stu.score;
+	int x, y;
+	_course* pCurCourse = pHeadCourse;
+	while (pCur != nullptr) {
+		while (pCurCourse != nullptr) {
+			if (pCur->data.course_ID == pCurCourse->data.courseId) {
+				for (int i = 0; i < 2; i++) {
+					if (pCurCourse->data.session[i].dayOfWeek == L"MON") x = 0;
+					else if (pCurCourse->data.session[i].dayOfWeek == L"TUE") x = 1;
+					else if (pCurCourse->data.session[i].dayOfWeek == L"WED") x = 2;
+					else if (pCurCourse->data.session[i].dayOfWeek == L"THU") x = 3;
+					else if (pCurCourse->data.session[i].dayOfWeek == L"FRI") x = 4;
+					else if (pCurCourse->data.session[i].dayOfWeek == L"SAT") x = 5;
+					else x = 6;
+					if (pCurCourse->data.session[i].hour == L"S1") y = 0;
+					else if (pCurCourse->data.session[i].hour == L"S2") y = 1;
+					else if (pCurCourse->data.session[i].hour == L"S3") y = 2;
+					else if (pCurCourse->data.session[i].hour == L"S4") y = 3;
+					else y = 0;
+					stu.timeTable[y][x]++;
+				}
+			}
+			pCurCourse = pCurCourse->pNext;
+		}
+		pCurCourse = pHeadCourse;
+		pCur = pCur->pNext;
+	}
+
+}
+
 void addEnrolledCourse(student stu, string className, unsigned long long course_ID) {
 	string folderName = "Data\\Classes\\", fileFormat = ".csv";
 	wofstream fileOut;
@@ -375,7 +415,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 
 	//
 	if (countEnrolledCourse(stu) == 5) {
-		cout << "Full slot of enrolled course.";
+		cout << "Full slot of enrolled course.\n";
 		return;
 	}
 
@@ -393,7 +433,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 			stu = findInfoStudent(stu.Student_ID, className);
 		}
 		else cout << "Invalid choice\n";
-		cout << "\nEnter '0' to escape: ";
+		cout << "Enter '0' to escape: ";
 		cin >> temp;
 	}
 }
@@ -448,6 +488,18 @@ void menuManageCourseStudent(student stu, string className) {
 	readCourseFile(FolderPath + coursePath, pHeadCourse);
 	readAllIndividualCourseFile(FolderPath, pHeadCourse);
 
+	//create time table
+	createTimetable(stu, pHeadCourse);
+	cout << "MON TUE WED THU FRI SAT\n";
+	for (int i = 0; i < 4; i++) {
+		cout << " ";
+		for (int j = 0; j < 6; j++) {
+			cout << stu.timeTable[i][j] << "   ";
+		}
+		cout << endl;
+	}
+	system("PAUSE");
+
 	while (flag != 0) {
 		system("CLS");
 		cout << "1. Enroll course\n2. View enrolled course\n3. Remove enrolled course\n4. View scoreboard\n0. Back to main menu\n";
@@ -486,9 +538,6 @@ void menuStudent(unsigned long long ID, string className) {
 
 	// create separate file for that specific student
 	createStudentFile(stu, className);
-
-	//create time table
-	//de sau di
 
 	//menu
 	while (flag != 0) {

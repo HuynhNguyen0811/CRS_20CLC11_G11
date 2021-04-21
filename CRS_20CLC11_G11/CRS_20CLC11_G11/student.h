@@ -24,6 +24,8 @@ int countEnrolledCourse(student stu);
 
 bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse);
 
+void createTimetable(student& stu, _course* pHeadCourse);
+
 void addEnrolledCourse(student stu, string className, unsigned long long course_ID);
 void addStudentToCourse(unsigned long long student_ID, unsigned long long course_ID);
 
