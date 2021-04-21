@@ -17,6 +17,8 @@ void AtTheBeginningOfSemester();
 
 void inputFromKeyboardCourse(_course*& pHead);
 
+_studentRegis* takeTailStudentRegis(_studentRegis* pHead);
+
 void readCourseFile(string path, _course*& pHead);
 void readAllIndividualCourseFile(string path, _course* pHead);
 void readIndividualCourseFile(string path, _course* pHead); //read student attend
@@ -24,6 +26,7 @@ void readIndividualCourseFile(string path, _course* pHead); //read student atten
 void writeCourseFile(string path, _course* pHead);
 void writeIndividualCourseFile(string path, course pHead);
 void writeAllIndividualCourseFile(string path, _course* pHead);
+void writeIndividualCourseFileWithout1Student(string path, course pHead, unsigned long long student_ID);
 
 void addCourseListFile(string path, course pHead);
 void addIndividualCourseFile(string path, course pHead);

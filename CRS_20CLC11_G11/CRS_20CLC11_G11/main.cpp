@@ -5,6 +5,7 @@
 #include "commonFunc.h"
 
 int main() {
+
 	//createCourse();
 
 	//AtTheBeginningOfSchoolYear();
@@ -12,13 +13,13 @@ int main() {
 	/*student stu;
 	enrollCourse(stu);*/
 
-	unsigned long long ID = 20127575;
+	/*unsigned long long ID = 20127575;
 	string className = "20CLC11";
-	menuStudent(ID, className);
+	menuStudent(ID, className);*/
 	
-	/*unsigned long long ID = NULL;
+	unsigned long long ID = NULL;
 	string className = "";
-	login(ID, className);*/
+	login(ID, className);
 
 	return 0;
 }

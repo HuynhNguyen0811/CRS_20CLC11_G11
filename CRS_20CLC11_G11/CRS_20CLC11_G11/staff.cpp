@@ -13,11 +13,6 @@ void deleteListClass(_Class*& pHead) {
 void deleteListCourse(_course*& pHead) {
 	_course* pTmp = pHead;
 	while (pHead != nullptr) {
-		for (int i = 0; i < 2; i++) {
-			delete[] pHead->data.session[i].dayOfWeek;
-			delete[] pHead->data.session[i].hour;
-		}
-
 		delete[] pHead->data.session;
 		pHead = pHead->pNext;
 		delete pTmp;
@@ -212,18 +207,12 @@ void inputFromKeyboardCourse(_course*& pHead) {
 		}
 
 		pCur->data.session = new session[2];
-		for (int i = 0; i < 2; i++) {
-			pCur->data.session[i].dayOfWeek = new wchar_t[3 + 1];
-			pCur->data.session[i].hour = new wchar_t[2 + 1];
-		}
 
 		for (int i = 0; i < 2; i++) {
 			cout << "Day of week " << i + 1 << " of the course will performed (MON / TUE / WED / THU / FRI / SAT): ";
 			wcin >> pCur->data.session[i].dayOfWeek;
-			pCur->data.session[i].dayOfWeek[3] = '\0';
 			cout << "The session " << i + 1 << " of the course will performed (S1 (07:30), S2 (09:30), S3(13:30) and S4 (15:30)): ";
 			wcin >> pCur->data.session[i].hour;
-			pCur->data.session[i].hour[2] = '\0';
 		}
 		//string temp;
 		//cout << "Start registration date: "; cin >> temp; pCur->data.startRegis = stringToDate(temp);
@@ -238,10 +227,6 @@ void inputFromKeyboardCourse(_course*& pHead) {
 	pCur->pNext = new _course;
 	pCur = pCur->pNext;
 	pCur->data.session = new session[2];
-	for (int i = 0; i < 2; i++) {
-		pCur->data.session[i].dayOfWeek = new wchar_t[3 + 1];
-		pCur->data.session[i].hour = new wchar_t[2 + 1];
-	}
 	pCur->pNext = nullptr;
 }
 
@@ -249,12 +234,18 @@ void readCourseFile(string path, _course*& pHead) {
 	wifstream fileIn;
 	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+	fileIn.ignore(1000, wchar_t(0xfeff));
+
+	fileIn.seekg(0, ios_base::end);
+	int end = fileIn.tellg();
+	fileIn.seekg(0, ios_base::beg);
 
 	if (fileIn.fail())
 	{
 		cout << "File is not existed " << endl;
 		return;
 	}
+
 	_course* pCur = nullptr;
 	wstring temp;
 	wchar_t a = ',', b = '\n';
@@ -277,20 +268,13 @@ void readCourseFile(string path, _course*& pHead) {
 		pCur->data.maxStu = wstringToInt(temp);
 
 		pCur->data.session = new session[2];
-		for (int i = 0; i < 2; i++) {
-			pCur->data.session[i].dayOfWeek = new wchar_t[3 + 1];
-			pCur->data.session[i].hour = new wchar_t[2 + 1];
-		}
 
-		for (int i = 0; i < 2; i++) {
-			getline(fileIn, temp, a);
-			wstringToWchar(pCur->data.session[i].dayOfWeek, temp);
-			getline(fileIn, temp, a);
-			wstringToWchar(pCur->data.session[i].hour, temp);
-			pCur->data.session[i].dayOfWeek[3] = '\0';
-			pCur->data.session[i].hour[2] = '\0';
-		}
+		getline(fileIn, pCur->data.session[0].dayOfWeek, a);
+		getline(fileIn, pCur->data.session[0].hour, a);
 
+		getline(fileIn, pCur->data.session[1].dayOfWeek, a);
+		getline(fileIn, pCur->data.session[1].hour, a);
+		/*fileIn.ignore(1000, b);*/
 		getline(fileIn, temp, a);
 		pCur->data.startRegis = wstringToDate(temp);
 		getline(fileIn, temp, b);
@@ -308,13 +292,21 @@ void readAllIndividualCourseFile(string path, _course* pHead) {
 	}
 }
 
+_studentRegis* takeTailStudentRegis(_studentRegis* pHead) {
+	_studentRegis* pCur = pHead;
+	while (pCur != nullptr && pCur->pNext != nullptr) pCur = pCur->pNext;
+	return pCur;
+}
+
 void readIndividualCourseFile(string path, _course* pHead) { //to read id student that regis
 	wifstream fileIn;
 	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
 	wstring temp;
-	_studentRegis* pCur = nullptr;
+	_studentRegis* pCur = takeTailStudentRegis(pHead->data.studentID);
+	wchar_t a = ',';
+	fileIn.ignore(1000, '\n');
 	while (fileIn) {
 		if (pHead->data.studentID == nullptr) {
 			pHead->data.studentID = new _studentRegis;
@@ -324,9 +316,17 @@ void readIndividualCourseFile(string path, _course* pHead) { //to read id studen
 			pCur->pNext = new _studentRegis;
 			pCur = pCur->pNext;
 		}
-		fileIn.ignore(1000, '\n');
+
 		getline(fileIn, temp, L',');
 		pCur->data = wstringToLong(temp);
+		fileIn >> pCur->total >> a;
+		fileIn >> pCur->final >> a;
+		fileIn >> pCur->mid >> a;
+		fileIn >> pCur->other >> a;
+		fileIn >> pCur->gpa >> a;
+
+		fileIn.ignore(1000, '\n');
+
 		pCur->pNext = nullptr;
 	}
 	
@@ -364,7 +364,29 @@ void writeIndividualCourseFile(string path, course pHead) {
 
 	_studentRegis* pCur = pHead.studentID;
 	while (pCur != nullptr && pCur->pNext != nullptr) {
-		fileOut << pCur->data << endl;
+		fileOut << pCur->data << "," << pCur->total << "," << pCur->final << "," << pCur->mid << "," << pCur->other << "," << pCur->gpa << endl;
+		pCur = pCur->pNext;
+	}
+
+	fileOut.close();
+}
+
+void writeIndividualCourseFileWithout1Student(string path, course pHead, unsigned long long student_ID) {
+	wofstream fileOut;
+	fileOut.open(path, ios_base::out);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << pHead.courseId << "," << pHead.courseName << "," << pHead.teacherName << "," << pHead.credit << "," << pHead.maxStu << ",";
+	fileOut << pHead.session[0].dayOfWeek << "," << pHead.session[0].hour << ",";
+	fileOut << pHead.session[1].dayOfWeek << "," << pHead.session[1].hour << ",";
+	fileOut << pHead.startRegis.day << L"/" << pHead.startRegis.month << L"/" << pHead.startRegis.year << ",";
+	fileOut << pHead.endRegis.day << L"/" << pHead.endRegis.month << L"/" << pHead.endRegis.year << endl;
+
+	_studentRegis* pCur = pHead.studentID;
+	while (pCur != nullptr && pCur->pNext != nullptr) {
+		if (pCur->data != student_ID) {
+			fileOut << pCur->data << "," << pCur->total << "," << pCur->final << "," << pCur->mid << "," << pCur->other << "," << pCur->gpa << endl;
+		}
 		pCur = pCur->pNext;
 	}
 
@@ -489,15 +511,7 @@ void createCourseFromFile() {
 	cout << "Input the name of the file contain course's info: ";
 	cin >> path;
 	path += fileFormat;
-
-	ifstream fileIn; 
-	fileIn.open(path, ios_base::in);
-	if (fileIn.fail())
-	{
-		cout << "File is not existed " << endl;
-		fileIn.close();
-		return;
-	}
+	cout << path << endl;
 
 	readCourseFile(path, pHead);
 

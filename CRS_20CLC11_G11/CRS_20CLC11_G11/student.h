@@ -17,10 +17,19 @@ bool checkLogin(string path, unsigned long long ID, string password, string& cla
 
 void login(unsigned long long& ID, string& className);
 
+void createStudentFile(student stu, string className);
+void createStudentFileWithout1Course(student stu, string className, unsigned long long course_ID);
+
+bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse);
+
 void addEnrolledCourse(student stu, string className, unsigned long long course_ID);
+void addStudentToCourse(unsigned long long student_ID, unsigned long long course_ID);
+
+_score* takeTailEnrollCourse(student stu);
 
 void enrollCourse(student& stu, string className, _course* pHeadCourse);
 void viewEnrollCourse(student stu, _course* pHeadCourse);
+void removeEnrollCourse(student& stu, string className, _course* pHeadCourse);
 
 void menuManageCourseStudent(student stu, string className);
 void menuStudent(unsigned long long ID, string className);

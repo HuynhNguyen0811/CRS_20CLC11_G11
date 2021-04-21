@@ -43,6 +43,7 @@ struct _student {
 
 struct _studentRegis {
 	unsigned long long data;
+	double total = 0, final = 0, mid = 0, other = 0, gpa = 0;
 	_studentRegis* pNext;
 };
 
@@ -64,8 +65,8 @@ struct _semester {
 };
 
 struct session {
-	wchar_t* dayOfWeek;
-	wchar_t* hour;
+	std::wstring dayOfWeek;
+	std::wstring hour;
 };
 struct course {
 	unsigned long long courseId;

@@ -191,7 +191,6 @@ void changePassword(unsigned long long ID, string className) {
 //note: build lai struct score		 DONE
 
 
-
 student findInfoStudent(unsigned long long ID, string className) {
 	string folderName = "Data\\Classes\\", fileFormat = ".csv";
 	wifstream fileIn;
@@ -244,8 +243,6 @@ student findInfoStudent(unsigned long long ID, string className) {
 
 		pCurScore->pNext = nullptr;
 	}
-
-	printScoreboard(stu);
 
 	fileIn.close();
 	return stu;
@@ -302,6 +299,29 @@ void createStudentFile(student stu, string className) {
 	fileOut.close();
 }
 
+void createStudentFileWithout1Course(student stu, string className, unsigned long long course_ID) {
+
+	string folderName = "Data\\Classes\\", fileFormat = ".csv";
+	char* path = new char[(folderName + className).size() + 1];
+	stringToChar(path, folderName + className);
+	_mkdir(path);
+	wofstream fileOut;
+	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::out);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << stu.Student_ID << L"," << stu.FirstName << L"," << stu.LastName << L"," << stu.Gender << L"," << stu.Date_Of_Birth.day << wchar_t(47) << stu.Date_Of_Birth.month << wchar_t(47) << stu.Date_Of_Birth.year << L"," << stu.Social_ID << endl;
+
+	while (stu.score != nullptr && stu.score->pNext != nullptr) {
+		if (course_ID != stu.score->data.course_ID) {
+			fileOut << stu.score->data.course_ID << "," << stu.score->data.total << "," << stu.score->data.final << "," << stu.score->data.mid << "," << stu.score->data.other << "," << stu.score->data.gpa;
+			fileOut << endl;
+		}
+		stu.score = stu.score->pNext;
+	}
+
+	fileOut.close();
+}
+
 bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse) {
 	while (pHeadCourse != nullptr) {
 		if (pHeadCourse->data.courseId == tempID) return 1;
@@ -316,7 +336,18 @@ void addEnrolledCourse(student stu, string className, unsigned long long course_
 	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::app);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
-	fileOut << course_ID << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << endl;
+	fileOut << course_ID << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << endl;
+
+	fileOut.close();
+}
+
+void addStudentToCourse(unsigned long long student_ID, unsigned long long course_ID) {
+	string FolderPath = "Data\\Course\\", fileFormat = ".csv";
+	wofstream fileOut;
+	fileOut.open(FolderPath + to_string(course_ID) + fileFormat, ios_base::app);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	fileOut << student_ID << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << endl;
 
 	fileOut.close();
 }
@@ -333,28 +364,23 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 	cout << "Course's information list: " << endl;
 	displayCourseConsole(pHeadCourse);
 
+	//
+
 	int temp = -1;
 	unsigned long long tempID;
-	_score* pCur = takeTailEnrollCourse(stu);
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 	while (temp != 0) {
 		cout << "Input the course's ID you want to enroll: ";
 		cin >> tempID;
 		if (checkEnrollCourse(tempID, pHeadCourse)) {
-			if (stu.score == nullptr) {
-				stu.score = new _score;
-				pCur = stu.score;
-			}
-			else {
-				pCur->pNext = new _score;
-				pCur = pCur->pNext;
-			}
-			pCur->data.course_ID = tempID;
-			pCur->pNext = nullptr;
-
 			addEnrolledCourse(stu, className, tempID);
+			addStudentToCourse(stu.Student_ID, tempID);
+			
+			readAllIndividualCourseFile(FolderPath, pHeadCourse);
+			stu = findInfoStudent(stu.Student_ID, className);
 		}
 		else cout << "Invalid choice\n";
-		cout << "Enter '0' to escape: ";
+		cout << "\nEnter '0' to escape: ";
 		cin >> temp;
 	}
 }
@@ -362,10 +388,10 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 void viewEnrollCourse(student stu, _course* pHeadCourse) {
 	cout << "Enrolled course: " << endl;
 
-	_course* pDisplay = nullptr;
+	//_course* pDisplay = nullptr;
 	_score* pCur = stu.score;
 
-	while (pHeadCourse != nullptr) {
+	while (pHeadCourse != nullptr && pHeadCourse->pNext != nullptr) {
 		while (pCur != nullptr) {
 			if (pCur->data.course_ID == pHeadCourse->data.courseId) displayIndividualCourseConsole(pHeadCourse->data);
 			pCur = pCur->pNext;
@@ -373,19 +399,44 @@ void viewEnrollCourse(student stu, _course* pHeadCourse) {
 		pCur = stu.score;
 		pHeadCourse = pHeadCourse->pNext;
 	}
+
+}
+
+void removeEnrollCourse(student& stu, string className, _course* pHeadCourse) {
+	viewEnrollCourse(stu, pHeadCourse);
+	int temp, tempID;
+	_course* pCur = nullptr;
+	cout << "Enter 0 to skip remove course section: ";
+	cin >> temp;
+	while (temp != 0) {
+		cout << "Enter course's ID you want to remove: ";
+		cin >> tempID;
+		pCur = pHeadCourse;
+		while (pCur != nullptr && pCur->data.courseId != tempID) { pCur = pCur->pNext; }
+		if (pCur != nullptr) {
+			writeIndividualCourseFileWithout1Student("Data\\Course\\" + to_string(pCur->data.courseId) + ".csv", pCur->data, stu.Student_ID);
+			createStudentFileWithout1Course(stu, className, tempID);
+
+			readAllIndividualCourseFile("Data\\Course\\", pHeadCourse);
+			stu = findInfoStudent(stu.Student_ID, className);
+		}
+
+		cout << "Enter 0 to escape: ";
+		cin >> temp;
+	}
 }
 
 void menuManageCourseStudent(student stu, string className) {
 	int flag = -1;
 	//load toan bo course hien co
-	_course* pHeadCourse = nullptr, * pEdit;
+	_course* pHeadCourse = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
-
 	readCourseFile(FolderPath + coursePath, pHeadCourse);
+	readAllIndividualCourseFile(FolderPath, pHeadCourse);
 
 	while (flag != 0) {
 		system("CLS");
-		cout << "1. Enroll course\n2. View enrolled course\n3. View scoreboard\n0. Back to main menu\n";
+		cout << "1. Enroll course\n2. View enrolled course\n3. Remove enrolled course\n4. View scoreboard\n0. Back to main menu\n";
 		cin >> flag;
 
 		switch (flag) {
@@ -398,6 +449,10 @@ void menuManageCourseStudent(student stu, string className) {
 			system("PAUSE");
 			break;
 		case 3:
+			removeEnrollCourse(stu, className, pHeadCourse);
+			system("PAUSE");
+			break;
+		case 4:
 			printScoreboard(stu);
 			system("PAUSE");
 			break;
@@ -423,7 +478,7 @@ void menuStudent(unsigned long long ID, string className) {
 
 	//menu
 	while (flag != 0) {
-		//system("CLS");
+		system("CLS");
 		cout << "1. View info\n2. Manage course\n3. Change password\n0. Log out\n";
 		cin >> flag;
 		switch (flag) {
