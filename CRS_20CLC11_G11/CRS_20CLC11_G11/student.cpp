@@ -190,6 +190,15 @@ void changePassword(unsigned long long ID, string className) {
 
 //note: build lai struct score		 DONE
 
+int countEnrolledCourse(student stu) {
+	int result = 0;
+	_score* pCur = stu.score;
+	while (pCur != nullptr && pCur->pNext != nullptr) {
+		result++;
+		pCur = pCur->pNext;
+	}
+	return result;
+}
 
 student findInfoStudent(unsigned long long ID, string className) {
 	string folderName = "Data\\Classes\\", fileFormat = ".csv";
@@ -365,6 +374,10 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 	displayCourseConsole(pHeadCourse);
 
 	//
+	if (countEnrolledCourse(stu) == 5) {
+		cout << "Full slot of enrolled course.";
+		return;
+	}
 
 	int temp = -1;
 	unsigned long long tempID;
@@ -386,6 +399,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 }
 
 void viewEnrollCourse(student stu, _course* pHeadCourse) {
+	cout << "Total course: " << countEnrolledCourse(stu) << endl;
 	cout << "Enrolled course: " << endl;
 
 	//_course* pDisplay = nullptr;

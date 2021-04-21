@@ -42,6 +42,7 @@ _course* findCourse(unsigned long long ID, _course* pHead);
 void createCourseFromKeyboard();
 void createCourseFromFile();
 void editCourse();
+void removeCourse();
 
 void createCourse();
 

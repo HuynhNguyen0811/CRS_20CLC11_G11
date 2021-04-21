@@ -20,6 +20,8 @@ void login(unsigned long long& ID, string& className);
 void createStudentFile(student stu, string className);
 void createStudentFileWithout1Course(student stu, string className, unsigned long long course_ID);
 
+int countEnrolledCourse(student stu);
+
 bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse);
 
 void addEnrolledCourse(student stu, string className, unsigned long long course_ID);

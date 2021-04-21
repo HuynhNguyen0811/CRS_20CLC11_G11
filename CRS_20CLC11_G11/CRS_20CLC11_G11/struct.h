@@ -33,8 +33,7 @@ struct student {
 
 	_score* score = nullptr;
 	//_course* course = nullptr;
-
-	double GPA = 0;
+	bool** timeTable = nullptr;
 };
 struct _student {
 	student data;
