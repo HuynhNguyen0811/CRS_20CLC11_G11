@@ -351,6 +351,26 @@ void writeCourseFile(string path, _course* pHead) {
 	fileOut.close();
 }
 
+void writeCourseFileWithout1Course(string path, _course* pHead, unsigned long long tempID) {
+	if (pHead == nullptr) return;
+	wofstream fileOut;
+	fileOut.open(path, ios_base::out);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	while (pHead->pNext != nullptr) {
+		if (tempID != pHead->data.courseId) {
+			fileOut << pHead->data.courseId << "," << pHead->data.courseName << "," << pHead->data.teacherName << "," << pHead->data.credit << "," << pHead->data.maxStu << ",";
+			fileOut << pHead->data.session[0].dayOfWeek << "," << pHead->data.session[0].hour << ",";
+			fileOut << pHead->data.session[1].dayOfWeek << "," << pHead->data.session[1].hour << ",";
+			fileOut << pHead->data.startRegis.day << L"/" << pHead->data.startRegis.month << L"/" << pHead->data.startRegis.year << ",";
+			fileOut << pHead->data.endRegis.day << L"/" << pHead->data.endRegis.month << L"/" << pHead->data.endRegis.year << endl;
+		}
+		pHead = pHead->pNext;
+	}
+
+	fileOut.close();
+}
+
 void writeIndividualCourseFile(string path, course pHead) {
 	wofstream fileOut;
 	fileOut.open(path, ios_base::out);
@@ -581,10 +601,32 @@ void editCourse() {
 	deleteListCourse(pHead);
 }
 
+void removeCourse() {
+	_course* pHead = nullptr, * pEdit;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+
+	readCourseFile(FolderPath + coursePath, pHead);
+	readAllIndividualCourseFile(FolderPath, pHead);
+
+	cout << "Course's information list: " << endl;
+	displayCourseConsole(pHead);
+
+	unsigned long long tempID;
+	cout << "Enter the ID of the course you want to remove: ";
+	cin >> tempID;
+
+	writeCourseFileWithout1Course(FolderPath + coursePath, pHead, tempID);
+	string path;
+	path = FolderPath + to_string(tempID) + fileFormat;
+	remove(path.c_str());
+
+	deleteListCourse(pHead);
+}
+
 void createCourse() {
 	int flag = -1;
 	while (flag != 0) {
-		cout << "1. Input course from keyboard\n2. Input course from file .csv\n3. Edit course's information\n0. Escape\n";
+		cout << "1. Input course from keyboard\n2. Input course from file .csv\n3. Edit course's information\n4. Remove course\n0. Escape\n";
 		cin >> flag;
 		switch (flag) {
 		case 1:
@@ -595,6 +637,9 @@ void createCourse() {
 			break;
 		case 3:
 			editCourse();
+			break;
+		case 4:
+			removeCourse();
 			break;
 		default:
 			break;

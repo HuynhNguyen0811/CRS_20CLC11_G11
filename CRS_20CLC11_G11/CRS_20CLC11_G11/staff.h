@@ -24,6 +24,7 @@ void readAllIndividualCourseFile(string path, _course* pHead);
 void readIndividualCourseFile(string path, _course* pHead); //read student attend
 
 void writeCourseFile(string path, _course* pHead);
+void writeCourseFileWithout1Course(string path, _course* pHead, unsigned long long tempID);
 void writeIndividualCourseFile(string path, course pHead);
 void writeAllIndividualCourseFile(string path, _course* pHead);
 void writeIndividualCourseFileWithout1Student(string path, course pHead, unsigned long long student_ID);
