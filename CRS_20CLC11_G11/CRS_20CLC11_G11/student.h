@@ -22,9 +22,12 @@ void createStudentFileWithout1Course(student stu, string className, unsigned lon
 
 int countEnrolledCourse(student stu);
 
-bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse);
+bool checkEnrollCourse(unsigned long long tempID, _course* pHeadCourse, student stu);
+bool checkConflictCourse(student stu, course course);
 
+void deleteTimeTable(student& stu);
 void createTimetable(student& stu, _course* pHeadCourse);
+void displayTimetable(student stu);
 
 void addEnrolledCourse(student stu, string className, unsigned long long course_ID);
 void addStudentToCourse(unsigned long long student_ID, unsigned long long course_ID);
