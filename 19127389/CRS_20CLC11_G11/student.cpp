@@ -67,11 +67,14 @@ void login() {
 				ifstream fileIn;
 				fileIn.open(path, ios_base::in);
 				unsigned long long tempID = NULL, checkID = NULL;
+				string temp, tempClass;
 				while (fileIn)
 				{
 					getline(fileIn, temp, ',');
+					tempID = stringToLong(temp);
 					getline(fileIn, temp, ',');
-					fileIn >> ClassName;
+					fileIn >> tempClass;
+					if (tempID == IDStudent && temp == password) ClassName = tempClass;
 				}
 				fileIn.close();
 			}
