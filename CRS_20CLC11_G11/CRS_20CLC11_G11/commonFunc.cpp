@@ -136,3 +136,12 @@ void stringToChar(char* destination, string source) {
 		destination[i] = source[i];
 	}
 }
+
+int countLine(string path) {
+	ifstream fileIn;
+	string temp;
+	int line;
+	fileIn.open(path);
+	for (line = 0; getline(fileIn, temp); line++);
+	return line;
+}

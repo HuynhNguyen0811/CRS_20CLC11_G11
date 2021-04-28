@@ -5,16 +5,12 @@
 #include "commonFunc.h"
 
 int main() {
+	//cout << countLine("Course.csv");
+
 	//createCourse();
 
-	//AtTheBeginningOfSchoolYear();
+	AtTheBeginningOfSchoolYear();
 
-	/*student stu;
-	enrollCourse(stu);*/
-
-	/*unsigned long long ID = 20127575;
-	string className = "20CLC11";
-	menuStudent(ID, className);*/
 	
 	unsigned long long ID = NULL;
 	string className = "";

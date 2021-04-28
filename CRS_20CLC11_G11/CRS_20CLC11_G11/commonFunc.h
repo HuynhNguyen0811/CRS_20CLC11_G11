@@ -6,6 +6,8 @@
 #include <Windows.h>
 #include <string>
 
+#include <fstream>
+
 #include <cmath>
 
 #include<io.h> //utf
@@ -32,5 +34,7 @@ Date wstringToDate(wstring str);
 
 void wstringToWchar(wchar_t* destination, wstring source);
 void stringToChar(char* destination, string source);
+
+int countLine(string path);
 
 #endif

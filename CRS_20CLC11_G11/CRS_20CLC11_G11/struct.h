@@ -41,7 +41,9 @@ struct _student {
 };
 
 struct _studentRegis {
+	int no;
 	unsigned long long data;
+	std::wstring name;
 	double total = 0, final = 0, mid = 0, other = 0, gpa = 0;
 	_studentRegis* pNext;
 };
@@ -95,10 +97,11 @@ struct _score {
 struct account {
 	unsigned long long Student_ID;
 	std::string password;
+	std::string className;
 };
 struct _account {
 	account data;
-	_account* pNext, * pPrevious;
+	_account* pNext;
 }; 
 
 #endif

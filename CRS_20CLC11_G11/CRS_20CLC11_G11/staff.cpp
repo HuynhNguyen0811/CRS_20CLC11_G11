@@ -29,9 +29,9 @@ void deleteListStudentAttend(_studentRegis* pHead) {
 	}
 }
 
-void loadClassName(string className, _Class*& pHeadClass) {
+void loadClassName(string path, _Class*& pHeadClass) {
 	ifstream fileIn;
-	fileIn.open(className, ios_base::in);
+	fileIn.open(path, ios_base::in);
 	_Class* pCurClass = nullptr;
 	while (fileIn) {
 		if (pHeadClass == nullptr) {
@@ -47,6 +47,13 @@ void loadClassName(string className, _Class*& pHeadClass) {
 	}
 
 	fileIn.close();
+}
+
+void displayClassName(string path, _Class* pHead) {
+	while (pHead != nullptr && pHead->pNext != nullptr) {
+		cout << pHead->data.name << endl;
+		pHead = pHead->pNext;
+	}
 }
 
 void createClassListFile(string path, string className) {
@@ -501,6 +508,19 @@ _course* findCourse(unsigned long long ID, _course* pHead) {
 	}
 }
 
+void displayStudentAttendConsole() {
+	//outside
+
+	//display list of courses
+	//choose course
+
+	//read account
+
+	//create new linked list _account contain both student ID and class they in
+
+	//loop that linked list just create to open file and create another linked list _student
+}
+
 void createCourseFromKeyboard() {
 	_course* pHead = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
@@ -646,3 +666,27 @@ void createCourse() {
 		}
 	}
 }
+
+void inputScoreboard(string path, _student* pHead) {
+	//outside
+
+	//display list of courses
+	//choose course
+	//input file name
+
+	//inside
+	
+	//load
+	//write
+}
+
+void displayScoreboardConsole() {
+	//while
+	//cout
+}
+
+void writeScoreboard() {
+	//while
+	//fileOut
+}
+
