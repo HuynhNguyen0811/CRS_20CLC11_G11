@@ -340,6 +340,29 @@ void readIndividualCourseFile(string path, _course* pHead) { //to read id studen
 	fileIn.close();
 }
 
+void readAccount(string path, _account* &pHead) {
+	ifstream fileIn;
+	fileIn.open(path, ios_base::in);
+
+	_account* pCur = nullptr;
+	string tempID;
+	while (fileIn) {
+		if (pHead == nullptr) {
+			pHead = new _account;
+			pCur = pHead;
+		}
+		else {
+			pCur->pNext = new _account;
+			pCur = pCur->pNext;
+		}
+		getline(fileIn, tempID, ',');
+		pCur->data.Student_ID = stringToLong(tempID);
+		getline(fileIn, pCur->data.password, ',');
+		getline(fileIn, pCur->data.className, '\n');
+		pCur->pNext = nullptr;
+	}
+}
+
 void writeCourseFile(string path, _course* pHead) {
 	if (pHead == nullptr) return;
 	wofstream fileOut;
@@ -667,7 +690,92 @@ void createCourse() {
 	}
 }
 
-void inputScoreboard(string path, _student* pHead) {
+void viewAttendStudent() {
+	_course* pHead = nullptr, * pEdit;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+
+	readCourseFile(FolderPath + coursePath, pHead);
+	readAllIndividualCourseFile(FolderPath, pHead);
+
+	_account* pHeadAccount = nullptr;
+	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
+
+	cout << "Course's information list: " << endl;
+	displayCourseConsole(pHead);
+
+	unsigned long long tempID;
+	_student* pHeadStu = nullptr, *pCreateStu = nullptr, *pDisplayStu = nullptr;
+	_studentRegis* pCurStu;
+	_account* pCurAccount;
+	_course* pDisplay;
+	int temp = 1;
+
+	wifstream fileIn;
+	string path;
+	wstring tempRead;
+	wchar_t a = ',';
+
+	while (temp != 0) {
+		cout << "Enter the ID of the course you want to view student list: ";
+		cin >> tempID;
+		pDisplay = findCourse(tempID, pHead); //have list of attend student's ID
+
+		pCurStu = pDisplay->data.studentID;
+		pCurAccount = pHeadAccount;
+		while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
+			while (pCurAccount != nullptr && pCurAccount->pNext != nullptr) {
+				if (pCurStu->data == pCurAccount->data.Student_ID) {
+					//open doc file blum bla
+					path = "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv";
+					fileIn.open(path, ios_base::in);
+					fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+					/*cout << "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv" << endl;
+					cout << path << endl;*/
+					if (!fileIn) cout << "toang" << endl;
+					if (pHeadStu == nullptr) {
+						pHeadStu = new _student;
+						pCreateStu = pHeadStu;
+					}
+					else {
+						pCreateStu->pNext = new _student;
+						pCreateStu = pCreateStu->pNext;
+					}
+					getline(fileIn, tempRead, a);
+					pCreateStu->data.Student_ID = wstringToLong(tempRead);
+					getline(fileIn, pCreateStu->data.FirstName, a);
+					getline(fileIn, pCreateStu->data.LastName, a);
+					getline(fileIn, pCreateStu->data.Gender, a);
+					getline(fileIn, tempRead, a);
+					pCreateStu->data.Date_Of_Birth = wstringToDate(tempRead);
+					fileIn >> pCreateStu->data.Social_ID;
+
+					fileIn.close();
+					pCreateStu->pNext = nullptr;
+				}
+				pCurAccount = pCurAccount->pNext;
+			}
+			//cout << "\n\t1" << pCurStu->data;
+			pCurStu = pCurStu->pNext;
+			pCurAccount = pHeadAccount;
+		}
+		cout << "List of student attend: \n";
+		pDisplayStu = pHeadStu;
+		_LText();
+		while (pDisplayStu != nullptr) {
+			wcout << pDisplayStu->data.Student_ID << " " << pDisplayStu->data.FirstName << " " << pDisplayStu->data.LastName << " " << pDisplayStu->data.Gender << " ";
+			wcout << pDisplayStu->data.Date_Of_Birth.day << wchar_t(92) << pDisplayStu->data.Date_Of_Birth.month << wchar_t(92) << pDisplayStu->data.Date_Of_Birth.year << " ";
+			wcout << pDisplayStu->data.Social_ID << endl;
+			pDisplayStu = pDisplayStu->pNext;
+		}
+		_SText();
+		deleteListStudent(pHeadStu);
+		pHeadStu = nullptr;
+		cout << "Enter 0 to escape: ";
+		cin >> temp;
+	}
+}
+
+void readScoreboard(string path, _student* pHead) {
 	//outside
 
 	//display list of courses
@@ -680,13 +788,16 @@ void inputScoreboard(string path, _student* pHead) {
 	//write
 }
 
-void displayScoreboardConsole() {
+void displayScoreboardConsole(course course) {
 	//while
 	//cout
 }
 
-void writeScoreboard() {
+void writeScoreboard(string path, course course) {
 	//while
 	//fileOut
 }
 
+void inputScoreboard() {
+
+}

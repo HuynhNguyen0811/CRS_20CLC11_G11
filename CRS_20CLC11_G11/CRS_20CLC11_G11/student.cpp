@@ -433,7 +433,7 @@ void addStudentToCourse(unsigned long long student_ID, unsigned long long course
 	fileOut.open(FolderPath + to_string(course_ID) + fileFormat, ios_base::app);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
-	fileOut << student_ID << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << endl;
+	fileOut << student_ID << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << ",,,,," << endl;
 
 	fileOut.close();
 }

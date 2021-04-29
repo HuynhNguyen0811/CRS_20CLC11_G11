@@ -23,6 +23,7 @@ _studentRegis* takeTailStudentRegis(_studentRegis* pHead);
 void readCourseFile(string path, _course*& pHead);
 void readAllIndividualCourseFile(string path, _course* pHead);
 void readIndividualCourseFile(string path, _course* pHead); //read student attend
+void readAccount(string path, _account*& pHead); //read ID, pass, class name of every student
 
 void writeCourseFile(string path, _course* pHead);
 void writeCourseFileWithout1Course(string path, _course* pHead, unsigned long long tempID);
@@ -44,6 +45,7 @@ void createCourseFromKeyboard();
 void createCourseFromFile();
 void editCourse();
 void removeCourse();
+void viewAttendStudent();
 
 void createCourse();
 

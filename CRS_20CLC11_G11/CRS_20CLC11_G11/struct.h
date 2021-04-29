@@ -37,7 +37,7 @@ struct student {
 };
 struct _student {
 	student data;
-	_student* pNext, * pPrevious;
+	_student* pNext;
 };
 
 struct _studentRegis {
