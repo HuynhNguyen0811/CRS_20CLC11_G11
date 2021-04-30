@@ -11,15 +11,10 @@ int main() {
 
 	//AtTheBeginningOfSchoolYear();
 
-	/*wifstream fileIn;
-	fileIn.open("Data\\Classes" + "20CLC11" + "\\" + "20127575" + ".csv", ios_base::in);
-	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+	//displayClassAndStudent();
 
-
-
-	fileIn.close();*/
-
-	viewAttendStudent();
+	//viewAttendStudent();
+	writeAttendStudent();
 	
 	/*unsigned long long ID = NULL;
 	string className = "";

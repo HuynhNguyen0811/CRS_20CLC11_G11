@@ -10,11 +10,13 @@ void deleteListCourse(_course*& pHead);
 void deleteListClass(_Class*& pHead);
 void deleteListStudentAttend(_studentRegis* pHead);
 
-void loadClassName(string className, _Class*& pHeadClass);
-void displayClassName(string path, _Class* pHead);
+void readStuInClass(string path, _student*& pHead);
+void readClassName(string path, _Class*& pHeadClass);
+void displayClassName(_Class* pHead);
 
 void AtTheBeginningOfSchoolYear();
 void AtTheBeginningOfSemester();
+void displayClassAndStudent();
 
 void inputFromKeyboardCourse(_course*& pHead);
 
@@ -46,7 +48,8 @@ void createCourseFromFile();
 void editCourse();
 void removeCourse();
 void viewAttendStudent();
+void writeAttendStudent();
 
-void createCourse();
+void createCourse(); //menu manage course
 
 #endif

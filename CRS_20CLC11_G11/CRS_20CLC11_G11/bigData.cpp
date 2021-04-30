@@ -4,17 +4,19 @@
 
 
 void readFileStudent(string& path, _student*& pHead) {
-	cout << "Please enter the name of the file you want to input: ";
-	cin >> path;
 	wifstream fileIn;
-	fileIn.open(path + ".csv", ios_base::in);
-	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+	do {
+		cout << "Please enter the name of the file you want to input: ";
+		cin >> path;
+		
+		fileIn.open(path + ".csv", ios_base::in);
+		fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
-	if (fileIn.fail())
-	{
-		cout << "File is not existed " << endl;
-		readFileStudent(path, pHead);
-	}
+		if (fileIn.fail())
+		{
+			cout << "File is not existed " << endl;
+		}
+	} while (fileIn.fail());
 
 	_student* pCur = nullptr;
 	wstring temp;

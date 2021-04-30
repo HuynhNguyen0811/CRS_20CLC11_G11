@@ -6,44 +6,49 @@
 #include <fcntl.h>  
 #include <io.h>
 #include <Windows.h>
-using namespace std;
 
-struct Date {
+struct Date
+{
 	int day, month, year;
 };
 
-struct Score {
-	string courseCode;
+struct Score
+{
+	std::string courseCode;
 	float mid = 0;
 	float final = 0;
 	float gpa = 0;
-	Score* next, * prev;
+	Score* next = nullptr, * prev = nullptr;
 };
 
-struct Student {
-	wstring Num;
-	wstring ID;
-	wstring Lastname;
-	wstring Firstname;
-	wstring Gender;
+struct Student
+{
+	std::wstring Num;
+	std::wstring ID;
+	std::wstring Lastname;
+	std::wstring Firstname;
+	std::wstring Gender;
 	Date Birthday;
-	wstring SocialID;
-	wstring password;
-	Score* score;
-	Student* next, * prev;
+	std::wstring SocialID;
+	std::wstring password;
+	int no_of_course;
+	Score* score = nullptr;
+	Student* next = nullptr, * prev = nullptr;
 };
-struct Courses {
-	wstring teacher;
+struct Courses
+{
+	std::wstring teacher;
 	Date startDate, endDate;
-	char*** Session;
-	wstring courseName;
-	string courseCode;
+	char*** Session = nullptr;
+	std::wstring courseName;
+	std::string courseCode;
+	int MaxStudent;
 	int credit;
-	Student* Stu;
+	Student* Stu = nullptr;
 	Courses* next = nullptr, * prev = nullptr;
 };
 
-Date Birthday(wstring k)
+Date Birthday(std::wstring k)
 {
 	Date d{ 0,0,0 };
 	int i = 0;
@@ -72,15 +77,37 @@ void GotoXY(int x, int y)
 	SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
+wchar_t* StringtoLongChar(std::string k)
+{
+	int temp = k.length();
+	wchar_t* p = new wchar_t[temp + 1];
+	for (int i = 0; i < temp; i++)
+	{
+		p[i] = k[i];
+	}
+	p[temp] = '\0';
+	return p;
+}
 
-string WstringToString(wstring source) {
-	string temp;
+
+std::string WstringToString(std::wstring source) {
+	std::string temp;
 	temp.resize(source.size());
 	for (int i = 0; i < source.length(); i++) {
 		temp[i] = source[i];
 	}
 	return temp;
 }
+
+std::wstring StringToWString(std::string source) {
+	std::wstring temp;
+	temp.resize(source.size());
+	for (int i = 0; i < source.length(); i++) {
+		temp[i] = source[i];
+	}
+	return temp;
+}
+
 
 void Vietlanguage()
 {
@@ -94,19 +121,7 @@ void ASCIIlanguage()
 	_setmode(_fileno(stdout), _O_TEXT);
 }
 
-wchar_t* StringtoLongChar(string k)
-{
-	int temp = k.length();
-	wchar_t* p = new wchar_t[temp + 1];
-	for (int i = 0; i < temp; i++)
-	{
-		p[i] = k[i];
-	}
-	p[temp] = '\0';
-	return p;
-}
-
-int WStringtoNum(wstring k)
+int WStringtoNum(std::wstring k)
 {
 	int sum = 0;
 	for (int i = 0; i < k.length(); i++)
@@ -116,21 +131,31 @@ int WStringtoNum(wstring k)
 	return sum;
 }
 
-Courses* InputCoursesCSV(Courses*& pHead, string k)
+int StringtoNum(std::string k)
+{
+	int sum = 0;
+	for (int i = 0; i < k.length(); i++)
+	{
+		sum = sum * 10 + (k[i] - '0');
+	}
+	return sum;
+}
+
+Courses* InputCoursesCSV(Courses*& pHead, std::string k)
 {
 	Courses* pCur = pHead;
-	wfstream CoursesCSV(k, wfstream::in);
+	std::wfstream CoursesCSV(k, std::wfstream::in);
 	CoursesCSV.imbue(std::locale(CoursesCSV.getloc(), new std::codecvt_utf8<wchar_t>));
 	if (CoursesCSV.fail())
 	{
-		cout << "File is not existed";
+		std::cout << "File is not existed";
 		return nullptr;
 	}
-	CoursesCSV.seekg(0, ios_base::end); //kiem thang ky tu cuoi cung cua file csv, vi no du 1 hang trong nen dich sang trai 1 buoc cho no dung ke thang SI cuoi cung
+	CoursesCSV.seekg(0, std::ios_base::end); //kiem thang ky tu cuoi cung cua file csv, vi no du 1 hang trong nen dich sang trai 1 buoc cho no dung ke thang SI cuoi cung
 	int end = CoursesCSV.tellg();
-	CoursesCSV.seekg(0, ios_base::beg);
+	CoursesCSV.seekg(0, std::ios_base::beg);
 	CoursesCSV.ignore(1i64, wchar_t(0xfeff)); //bo qua thang ky tu dau tien do dinh dang BOM UTF8
-	wstring x;
+	std::wstring x;
 	while (CoursesCSV.tellg() != end)//no se dung lai vi vi tri no be hon thang ke ben thang ky tu cuoi cung
 	{
 		if (pHead == nullptr)
@@ -148,6 +173,8 @@ Courses* InputCoursesCSV(Courses*& pHead, string k)
 		pCur->courseCode = WstringToString(x);
 		getline(CoursesCSV, pCur->courseName, L',');
 		getline(CoursesCSV, pCur->teacher, L',');
+		getline(CoursesCSV, x, L',');
+		pCur->MaxStudent = WStringtoNum(x);
 		getline(CoursesCSV, x, L',');
 		pCur->credit = WStringtoNum(x);
 		getline(CoursesCSV, x, L',');
@@ -172,72 +199,23 @@ Courses* InputCoursesCSV(Courses*& pHead, string k)
 	return pCur;
 }
 
-void ouputAllCourses(Courses*& pHead) {
-	Courses* pCur = pHead;
-	int count = 0;
-	while (pCur) {
-		count += 1;
-		cout << count << ".)" << endl;
-		Vietlanguage();
-		wcout << "Course name: " << pCur->courseName << endl;
-		wcout << "Teacher name: " << pCur->teacher << endl;
-		ASCIIlanguage();
-		cout << "Credit: " << pCur->credit << endl;
-		cout << "Course ID: " << pCur->courseCode << endl;
-		cout << "Session: " << pCur->Session[0][0] << pCur->Session[0][1] << pCur->Session[1][0] << pCur->Session[1][1] << endl;
-		cout << "Start Date: " << pCur->startDate.day << " " << pCur->startDate.month << " " << pCur->startDate.year << endl;
-		cout << "End Date: " << pCur->endDate.day << " " << pCur->endDate.month << " " << pCur->endDate.year << endl << endl;
-		pCur = pCur->next;
-	}
-}
-
-Courses* ouputCoursesbyID(Courses* pHead, string cID) {
-	while (pHead != nullptr)
-	{
-		if (pHead->courseCode.compare(cID) == 0) {
-			Vietlanguage();
-			wcout << "Course name: " << pHead->courseName << endl;
-			wcout << "Teacher name: " << pHead->teacher << endl;
-			ASCIIlanguage();
-			cout << "Course ID: " << pHead->courseCode << endl;
-			cout << "Session: " << pHead->Session[0][0] << pHead->Session[0][1] << pHead->Session[1][0] << pHead->Session[1][1] << endl;
-			cout << "Start Date: " << pHead->startDate.day << " " << pHead->startDate.month << " " << pHead->startDate.year << endl;
-			cout << "End Date: " << pHead->endDate.day << " " << pHead->endDate.month << " " << pHead->endDate.year << endl;
-			return pHead;
-		}
-		pHead = pHead->next;
-	}
-	return nullptr;
-}
 
 void PrintToChoose(Courses* pHead)
 {
 	int y = 0;
 	Courses* pCur = pHead;
 	Vietlanguage();
-	wcout << pCur->courseName;
-	wcout << " - " << pCur->teacher;
+	std::wcout << pCur->courseName;
+	std::wcout << " - " << pCur->teacher;
 	ASCIIlanguage();
-	cout << " - " << pCur->credit;
-	cout << " - " << pCur->courseCode;
-	cout << " - " << pCur->Session[0][0] << pCur->Session[0][1] << pCur->Session[1][0] << pCur->Session[1][1];
-	cout << " - " << pCur->startDate.day << " " << pCur->startDate.month << " " << pCur->startDate.year;
-	cout << " - " << pCur->endDate.day << " " << pCur->endDate.month << " " << pCur->endDate.year;
+	std::cout << " - " << pCur->credit;
+	std::cout << " - " << pCur->courseCode;
+	std::cout << " - " << pCur->Session[0][0] << pCur->Session[0][1] << pCur->Session[1][0] << pCur->Session[1][1];
+	std::cout << " - " << pCur->startDate.day << " " << pCur->startDate.month << " " << pCur->startDate.year;
+	std::cout << " - " << pCur->endDate.day << " " << pCur->endDate.month << " " << pCur->endDate.year;
 
 }
 
-bool CheckDup(string k, Score* HeadAdd)
-{
-	while (HeadAdd != nullptr)
-	{
-		if (HeadAdd->courseCode.compare(k) == 0)
-		{
-			return false;
-		}
-		else HeadAdd = HeadAdd->next;
-	}
-	return true;
-}
 
 bool CheckDup2(Courses** check, Courses* source, int n) {
 	if (n == 0) return true;
@@ -261,11 +239,11 @@ bool CheckSession(Courses** check, Courses* source, int n)
 	return true;
 }
 
-int StudentLimit(wstring k)
+int StudentLimit(std::string k)
 {
-	wfstream CourseStudentList(k, ios_base::in);
+	std::wfstream CourseStudentList(k, std::ios_base::in);
 	int line;
-	wstring lines;
+	std::wstring lines;
 
 	for (line = 0; getline(CourseStudentList, lines); line++);
 	return line;
@@ -273,18 +251,213 @@ int StudentLimit(wstring k)
 
 void SuccessAttend(Courses* a[5], int t)
 {
+	int y = 20;
 	for (int i = 0; i < 5; i++)
 	{
-		cout << "                                         ";
-		cout << endl;
+		GotoXY(0, y);
+		std::cout << "                                         ";
+		y++;
 	}
+	y = 20;
 	for (int i = 0; i < t; i++)
 	{
-		GotoXY(0, 20);
-		cout << a[i]->courseCode << "Accepted";
-		cout << endl;
+		GotoXY(0, y);
+		std::cout << a[i]->courseCode << "Accepted";
+		y++;
 	}
 }
+
+void DeallocateCourses(Courses*& pHead)
+{
+	Courses* pCur = pHead;
+	while (pHead != nullptr)
+	{
+		pHead = pHead->next;
+		delete pCur;
+		pCur = pHead;
+	}
+}
+
+void DeleteInList(std::string k, std::wstring a)
+{
+	std::wfstream CourseStudentList(k + ".txt", std::ios_base::in);
+	Student* pHead = nullptr;
+	Student* pCur = pHead;
+	CourseStudentList.seekg(-2, std::ios_base::end);
+	int end = CourseStudentList.tellg();
+	CourseStudentList.seekg(0, std::ios_base::beg);
+	while (CourseStudentList.tellg() != end)
+	{
+		if (pHead == nullptr)
+		{
+			pHead = new Student;
+			pCur = pHead;
+		}
+		else
+		{
+			pCur->next = new Student;
+			pCur->next->prev = pCur;
+			pCur = pCur->next;
+		}
+		getline(CourseStudentList, pCur->ID);
+	}
+	CourseStudentList.close();
+	pCur = pHead;
+
+	while (pCur != nullptr && pCur->next->ID.compare(a) != 0)
+	{
+		pCur = pCur->next;
+	}
+	Student* pTemp = nullptr;
+	if (pCur->next != nullptr)
+	{
+		pTemp = pCur->next;
+		pCur->next->next->prev = pCur;
+		pCur->next = pCur->next->next;
+		delete pTemp;
+	}
+
+	while (pHead != nullptr)
+	{
+		pCur = pHead;
+		pHead = pHead->next;
+		delete pCur;
+	}
+}
+
+bool CheckInList(std::string k, std::wstring a)
+{
+	std::wfstream CourseStudentList(k + ".txt", std::ios_base::in);
+	Student* pHead = nullptr;
+	Student* pCur = pHead;
+	CourseStudentList.seekg(-2, std::ios_base::end);
+	int end = CourseStudentList.tellg();
+	CourseStudentList.seekg(0, std::ios_base::beg);
+	while (CourseStudentList.tellg() != end)
+	{
+		if (pHead == nullptr)
+		{
+			pHead = new Student;
+			pCur = pHead;
+		}
+		else
+		{
+			pCur->next = new Student;
+			pCur->next->prev = pCur;
+			pCur = pCur->next;
+		}
+		getline(CourseStudentList, pCur->ID);
+	}
+	CourseStudentList.close();
+	pCur = pHead;
+
+	while (pCur->next->ID.compare(a) != 0)
+	{
+		pCur = pCur->next;
+	}
+	if (pCur->next != nullptr)
+	{
+		return true;
+	}
+	else return false;
+}
+
+Student* TakeList(std::wstring a, Student*& Temp)
+{
+	std::fstream AllStudentList("All.txt", std::ios_base::in);
+	Student* pHead = nullptr;
+	Student* pCur = pHead;
+	Score* pTemp = nullptr;
+	std::string x;
+	AllStudentList.seekg(-2, std::ios_base::end);
+	int end = AllStudentList.tellg();
+	AllStudentList.seekg(0, std::ios_base::beg);
+	while (AllStudentList.tellg() < end)
+	{
+		if (pHead == nullptr)
+		{
+			pHead = new Student;
+			pCur = pHead;
+		}
+		else
+		{
+			pCur->next = new Student;
+			pCur->next->prev = pCur;
+			pCur = pCur->next;
+		}
+		AllStudentList >> x;
+		pCur->ID = StringToWString(x);
+		AllStudentList >> x;
+		pCur->no_of_course = StringtoNum(x);
+		std::cout << pCur->no_of_course << " ";
+		//std::cout << x << " ";
+		for (int i = 0; i < pCur->no_of_course; i++)
+		{
+			if (pCur->score == nullptr)
+			{
+				pCur->score = new Score;
+				pTemp = pCur->score;
+			}
+			else
+			{
+				pTemp->next = new Score;
+				pTemp->next->prev = pTemp;
+				pTemp = pTemp->next;
+			}
+			AllStudentList >> pTemp->courseCode;
+		}
+		AllStudentList.ignore(10000, '\n');
+	}
+
+	AllStudentList.close();
+
+
+	pCur = pHead;
+	while (pCur != nullptr && pCur->ID.compare(a) != 0)
+	{
+		pCur = pCur->next;
+	}
+	if (pCur != nullptr)
+	{
+		Temp = pCur;
+		if (pCur->next != nullptr)
+			pCur->next->prev = pCur->prev;
+		if (pCur->prev != nullptr)
+			pCur->prev->next = pCur->next;
+		if (Temp == pHead) { pHead = pHead->next; pCur = pHead; }
+		else pCur = pHead;
+		AllStudentList.open("All.txt", std::ios_base::out);
+		while (pCur != nullptr)
+		{
+			//std::cout << 3;
+			AllStudentList << WstringToString(pCur->ID) << ' ';
+			AllStudentList << pCur->no_of_course << ' ';
+			pTemp = pCur->score;
+			for (int i = 0; i < pCur->no_of_course; i++)
+			{
+				if (i == pCur->no_of_course - 1)
+				{
+					AllStudentList << pTemp->courseCode << '\n';
+				}
+				else
+				{
+					AllStudentList << pTemp->courseCode << ' ';
+					pTemp = pTemp->next;
+				}
+			}
+			pCur = pCur->next;
+		}
+	}
+	while (pHead != nullptr)
+	{
+		//std::cout << 4;
+		pCur = pHead;
+		pHead = pHead->next;
+		delete pCur;
+	}
+	return Temp;
+}
+
 
 void AttendCoursesMenu(Courses* pHead, Student* stu)
 {
@@ -297,36 +470,73 @@ void AttendCoursesMenu(Courses* pHead, Student* stu)
 		pCur = pCur->next;
 		y = y + 1;
 	}
+
+	GotoXY(10, y + 2);
+	std::cout << "Instruction";
+	GotoXY(10, y + 3);
+	std::cout << "W move up";
+	GotoXY(10, y + 4);
+	std::cout << "S move down";
+	GotoXY(10, y + 5);
+	std::cout << "Enter to choose";
+	GotoXY(10, y + 6);
+	std::cout << "Backspace to unchoose";
+	GotoXY(10, y + 7);
+	std::cout << "E to exit and save" << std::endl;
+
 	y = 0;
 	pCur = pHead;
 	GotoXY(0, y);
-	cout << "->";
+	std::cout << "->";
 	char a;
-	a = _getwch();
+
 	int t = 0;
 	Courses** add = new Courses * [5];
-	while (a != 'e')//chac la se doi dk o day de tui no con xoa Course xai bien a
+
+	Student* Temp = nullptr;
+	TakeList(stu->ID, Temp);
+	std::wcout << Temp->ID;
+	a = _getwch();
+	if (Temp != nullptr)
+	{
+		Score* pAdd = Temp->score;
+		while (pAdd != nullptr)
+		{
+			while (pCur->courseCode.compare(pAdd->courseCode) != 0)
+			{
+				pCur = pCur->next;
+			}
+			add[t] = pCur;
+			t++;
+			pCur = pHead;
+			pAdd = pAdd->next;
+		}
+	}
+	SuccessAttend(add, t);
+	if (Temp != nullptr) delete Temp;
+
+	while (a != 'e')
 	{
 		while (a != 13 && a != 8)
 		{
 			if (tolower(a) == 'w' && pCur->prev != nullptr)
 			{
 				GotoXY(0, y);
-				PrintToChoose(pCur); cout << "  ";
+				PrintToChoose(pCur); std::cout << "  ";
 				pCur = pCur->prev;
 				y -= 1;
 				GotoXY(0, y);
-				cout << "->";
+				std::cout << "->";
 				PrintToChoose(pCur);
 			}
 			if (tolower(a) == 's' && pCur->next != nullptr)
 			{
 				GotoXY(0, y);
-				PrintToChoose(pCur); cout << "  ";
+				PrintToChoose(pCur); std::cout << "  ";
 				pCur = pCur->next;
 				y += 1;
 				GotoXY(0, y);
-				cout << "->";
+				std::cout << "->";
 				PrintToChoose(pCur);
 			}
 			a = _getwch();
@@ -338,30 +548,26 @@ void AttendCoursesMenu(Courses* pHead, Student* stu)
 			{
 				if (add[i]->courseCode.compare(pCur->courseCode) == 0)
 				{
+					DeleteInList(add[i]->courseCode, stu->ID);
 					add[i] = add[t - 1];
 					t -= 1;
-					cout << "delete";
-					GotoXY(0, 20);
 					SuccessAttend(add, t);
 					break;
 				}
 			}
 		}
-		if (a == 13 && CheckDup2(add, pCur, t) && CheckSession(add, pCur, t) /*&& StudentLimit(pCur->courseName + L".csv")<50*/)
+		if (a == 13 && CheckDup2(add, pCur, t) && CheckSession(add, pCur, t) && StudentLimit(pCur->courseCode + ".csv") < pCur->MaxStudent && t < 5)
 		{
-			cout << "done";
 			if (add == nullptr)
 			{
 				add[t] = pCur;
 				t++;
-				GotoXY(0, 20);
 				SuccessAttend(add, t);
 			}
 			else
 			{
 				add[t] = pCur;
 				t++;
-				GotoXY(0, 20);
 				SuccessAttend(add, t);
 			}
 		}
@@ -374,8 +580,6 @@ void AttendCoursesMenu(Courses* pHead, Student* stu)
 		{
 			stu->score = new Score;
 			stu->score->courseCode = add[i]->courseCode;
-			stu->score->next = nullptr;
-			stu->score->prev = nullptr;
 		}
 		else
 		{
@@ -386,53 +590,46 @@ void AttendCoursesMenu(Courses* pHead, Student* stu)
 		}
 	}
 
-	//luu file
-	pCur = pHead;
-	while (pCur != nullptr)
+	//pCur = pHead;
+	for (int i = 0; i < t; i++)
 	{
-		wfstream CourseStudentList(pCur->courseName + L".csv", ios_base::app);
-		CourseStudentList << stu->ID;
-		CourseStudentList.close();
-		pCur = pCur->next;
+		if (CheckInList(add[i]->courseCode, stu->ID) == 0)
+		{
+			std::wfstream CourseStudentList(add[i]->courseCode + ".txt", std::ios_base::app);
+			CourseStudentList << stu->ID << L'\n';
+			CourseStudentList.close();
+		}
 	}
 
-	pCur = pHead;
-	wfstream AllStudentScore;
-	AllStudentScore.open("Allstudent.csv");
-	Student* pStart = nullptr;
-	Student* pRun = pStart;
-	AllStudentScore.seekg(0, ios_base::end);
-	int end = AllStudentScore.tellg();
-	AllStudentScore.seekg(0, ios_base::beg);
-
-	while (AllStudentScore.tellg() != end);
+	std::wfstream AllStudentCourse("All.txt", std::ios_base::app);
+	AllStudentCourse.imbue(std::locale(AllStudentCourse.getloc(), new std::codecvt_utf8_utf16<wchar_t>));
+	AllStudentCourse << stu->ID << L' ';
+	AllStudentCourse << t << L' ';
+	for (int i = 0; i < t; i++)
 	{
-		if (pStart == nullptr)
+		if (i == t - 1)
 		{
-			pStart = new Student;
-			pRun = pStart;
+			wchar_t* temp = StringtoLongChar(add[i]->courseCode);
+			AllStudentCourse << temp << L'\n';
+			delete[]temp;
 		}
 		else
 		{
-			pRun->next = new Student;
-			pRun->next->prev = pRun;
-			pRun = pRun->next;
+			wchar_t* temp = StringtoLongChar(add[i]->courseCode);
+			AllStudentCourse << temp << L' ';
+			delete[]temp;
 		}
-		getline(AllStudentScore, pRun->ID);
 	}
-	AllStudentScore.close();
-
-	pRun = pStart;
-	while (stu->ID.compare(pRun->ID) != 0) pRun = pRun->next;
-	//quy dinh stt cua tung mon de luu vao ds All thi them 1 bien thu tu nua dc k cho de luu
+	AllStudentCourse.close();
 }
 
 void main()
 {
 	Courses* pHead = nullptr;
-	Student* stu = nullptr;
-	string k;
-	cin >> k;
-	InputCoursesCSV(pHead, k);
+	Student* stu = new Student;
+	stu->ID = L"20127101";
+	InputCoursesCSV(pHead, "testfinal.csv");
 	AttendCoursesMenu(pHead, stu);
+	//InputCousesCSV(pHead, k);
+	//AttendCoursesMenu(pHead,stu);
 }

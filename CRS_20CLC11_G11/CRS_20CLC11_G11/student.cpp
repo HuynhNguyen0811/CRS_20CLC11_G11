@@ -554,6 +554,9 @@ void menuManageCourseStudent(student stu, string className) {
 			printScoreboard(stu);
 			system("PAUSE");
 			break;
+		case 0:
+			// thieu delete
+			break;
 		default:
 			break;
 		}
