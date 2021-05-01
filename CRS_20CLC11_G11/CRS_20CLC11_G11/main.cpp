@@ -14,8 +14,10 @@ int main() {
 	//displayClassAndStudent();
 
 	//viewAttendStudent();
-	writeAttendStudent();
+	//writeAttendStudent();
 	
+	inputScoreboard();
+
 	/*unsigned long long ID = NULL;
 	string className = "";
 	login(ID, className);*/

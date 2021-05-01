@@ -1,4 +1,5 @@
 #include "staff.h"
+#include "student.h"
 #include "commonFunc.h"
 
 void deleteListClass(_Class*& pHead) {
@@ -732,6 +733,7 @@ void removeCourse() {
 	deleteListCourse(pHead);
 }
 
+//main menu manage course
 void createCourse() {
 	int flag = -1;
 	while (flag != 0) {
@@ -798,7 +800,7 @@ void viewAttendStudent() {
 					fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 					/*cout << "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv" << endl;
 					cout << path << endl;*/
-					if (!fileIn) cout << "toang" << endl;
+					
 					if (pHeadStu == nullptr) {
 						pHeadStu = new _student;
 						pCreateStu = pHeadStu;
@@ -940,34 +942,51 @@ void writeAttendStudent() {
 	deleteListCourse(pHead);
 }
 
-//coi nhu nguoi dung input du cot diem cua tuan bo sv
-void readScoreboard(string path, course& course) {
+//coi nhu nguoi dung input du cot diem cua toan bo sv
+void readScoreboard(string path, _course*& course) {
 	//delete student regis cu
-	deleteListStudentAttend(course.studentID);
-	course.studentID = nullptr;
+	deleteListStudentAttend(course->data.studentID);
+	course->data.studentID = nullptr;
 	//load
 	wifstream fileIn;
 	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
+	if (fileIn.fail())
+	{
+		cout << "File is not existed " << endl;
+		return;
+	}
+
 	_studentRegis* pCur = nullptr;
 	wchar_t a = ',', b = '\n';
 	while (fileIn) {
-		if (course.studentID == nullptr) {
-			course.studentID = new _studentRegis;
-			pCur = course.studentID;
+		if (course->data.studentID == nullptr) {
+			course->data.studentID = new _studentRegis;
+			pCur = course->data.studentID;
 		}
 		else {
 			pCur->pNext = new _studentRegis;
 			pCur = pCur->pNext;
 		}
 		fileIn >> pCur->no >> a;
+		fileIn >> pCur->data >> a;
 		getline(fileIn, pCur->name, a);
 		fileIn >> pCur->total >> a;
 		fileIn >> pCur->final >> a;
 		fileIn >> pCur->mid >> a;
 		fileIn >> pCur->other >> a;
-		fileIn >> pCur->gpa >> b;
+		fileIn >> pCur->gpa;
+		/*_LText();
+		wcout << pCur->no << " ";
+		wcout << pCur->data << " ";
+		wcout << pCur->name << " ";
+		wcout << pCur->total << " ";
+		wcout << pCur->final << " ";
+		wcout << pCur->mid << " ";
+		wcout << pCur->other << " ";
+		wcout << pCur->gpa << endl;
+		_SText();*/
 		pCur->pNext = nullptr;
 	}
 
@@ -975,31 +994,77 @@ void readScoreboard(string path, course& course) {
 	
 }
 
-void displayScoreboardConsole(course course) {
+void displayScoreboardConsole(_course* course) {
 	//loop
-	_studentRegis* pCur = course.studentID;
+	_studentRegis* pCur = course->data.studentID;
 	_LText();
 	while (pCur != nullptr && pCur->pNext != nullptr) {
-		
 		wcout << pCur->no << " ";
+		wcout << pCur->data << " ";
 		wcout << pCur->name << " ";
 		wcout << pCur->total << " ";
 		wcout << pCur->final << " ";
 		wcout << pCur->mid << " ";
 		wcout << pCur->other << " ";
 		wcout << pCur->gpa << endl;
-		
+		pCur = pCur->pNext;
 	}
 	_SText();
 }
 
-void writeScoreboard(string path, course course) {
-	//while
-	//fileOut
-}
+void writeScoreboardAllIndividualStu(_course* course) {
+	_studentRegis* pCurStu = course->data.studentID;
 
-void writeScoreboardIndividualStu(string path, _studentRegis* pEdit) {
+	_account* pHeadAccount = nullptr;
+	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
+	_account* pCurAccount;
 
+	wifstream fileIn;
+	wofstream fileOut;
+	string path;
+	//bien dung de giu tam thong tin cua student
+	student temp;
+	_score* pCurScore = nullptr;
+
+	while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
+		//tim file cua pCur->data 
+		pCurAccount = pHeadAccount;
+		while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
+			while (pCurAccount != nullptr && pCurAccount->pNext != nullptr) {
+				if (pCurStu->data == pCurAccount->data.Student_ID) {
+					cout << "Found out" << endl;
+					//co ID, co class cua sv
+					path = "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv";
+					//mo file cua sinh vien do
+					fileIn.open(path, ios_base::in);
+					fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+					//load toan bo info cua sinh vien do
+					temp = findInfoStudent(pCurAccount->data.Student_ID, pCurAccount->data.className);
+					//tim cot diem cua mon can chinh
+					pCurScore = temp.score;
+					while (pCurScore != nullptr && pCurScore->pNext != nullptr) {
+						if (pCurScore->data.course_ID == course->data.courseId) {
+							//edit
+							pCurScore->data.total = pCurStu->total;
+							pCurScore->data.final = pCurStu->final;
+							pCurScore->data.mid = pCurStu->mid;
+							pCurScore->data.other = pCurStu->other;
+							pCurScore->data.gpa = pCurStu->gpa;
+						}
+						pCurScore = pCurScore->pNext;
+					}
+					//rewrite
+					createStudentFile(temp, pCurAccount->data.className);
+					//delete
+					deleteListScore(temp);
+				}
+				pCurAccount = pCurAccount->pNext;
+			}
+
+			pCurStu = pCurStu->pNext;
+			pCurAccount = pHeadAccount;
+		}
+	}
 }
 
 void inputScoreboard() {
@@ -1009,23 +1074,46 @@ void inputScoreboard() {
 
 	readCourseFile(FolderPath + coursePath, pHead);
 	readAllIndividualCourseFile(FolderPath, pHead);
-
 	
 	//display list of courses
 	cout << "Course's information list: " << endl;
 	displayCourseConsole(pHead);
 
-	unsigned long long tempID;
-	cout << "Enter the ID of the course you want to edit: ";
-	cin >> tempID;
-
-	pEdit = findCourse(tempID, pHead);
 	//choose course
-	//find course in 
-	
+	unsigned long long tempID;
+	cout << "Enter the ID of the course you want to import scoreboard: ";
+	cin >> tempID;
+	//find course
+	pEdit = findCourse(tempID, pHead);
+	cout << pEdit->data.courseId << endl;
+
 	//input file name
-
+	cout << "Enter the name of file you want to import: ";
+	cin >> path;
 	//read
-
+	readScoreboard(path, pEdit);
+	/*cout << "---------------" << endl;
+	displayScoreboardConsole(pEdit);*/
 	//rewrite
+	path = FolderPath + to_string(pEdit->data.courseId) + fileFormat;
+	writeIndividualCourseFile(path, pEdit->data);
+	writeScoreboardAllIndividualStu(pEdit);
+	//delete
+	deleteListCourse(pHead);
+}
+
+void viewScoreboardCourse() {
+
+}
+
+void viewScoreboardClass() {
+
+}
+
+void editScoreFromCourse() {
+
+}
+
+void editScoreFromClass() {
+
 }

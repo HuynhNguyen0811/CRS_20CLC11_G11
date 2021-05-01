@@ -27,6 +27,16 @@
 //	}
 //}
 
+void deleteListScore(student& stu) {
+	_score* pCur = stu.score;
+	while (pCur != nullptr) {
+		stu.score = stu.score->pNext;
+		delete pCur;
+		pCur = stu.score;
+	}
+	stu.score = nullptr;
+}
+
 void deleteTimeTable(student& stu) {
 	for (int i = 0; i < 4; i++) {
 		delete[] stu.timeTable[i];
@@ -207,6 +217,7 @@ int countEnrolledCourse(student stu) {
 	return result;
 }
 
+//chua chia ham
 student findInfoStudent(unsigned long long ID, string className) {
 	string folderName = "Data\\Classes\\", fileFormat = ".csv";
 	wifstream fileIn;

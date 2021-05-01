@@ -4,6 +4,8 @@
 #include "bigData.h"
 #include "struct.h"
 
+void deleteListScore(student& stu);
+
 student findInfoStudent(unsigned long long ID, string className);
 student findStudent(unsigned long long ID, string className);
 

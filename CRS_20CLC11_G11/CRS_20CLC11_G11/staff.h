@@ -8,7 +8,7 @@ void menuStaff();
 
 void deleteListCourse(_course*& pHead);
 void deleteListClass(_Class*& pHead);
-void deleteListStudentAttend(_studentRegis* pHead);
+void deleteListStudentAttend(_studentRegis* &pHead);
 
 void readStuInClass(string path, _student*& pHead);
 void readClassName(string path, _Class*& pHeadClass);
@@ -49,6 +49,17 @@ void editCourse();
 void removeCourse();
 void viewAttendStudent();
 void writeAttendStudent();
+
+void readScoreboard(string path, _course*& course);
+
+void writeScoreboardAllIndividualStu(_course* course);
+
+void displayScoreboardConsole(_course* course);
+
+void inputScoreboard();
+void viewScoreboardCourse();
+void viewScoreboardClass();
+void editScore();
 
 void createCourse(); //menu manage course
 
