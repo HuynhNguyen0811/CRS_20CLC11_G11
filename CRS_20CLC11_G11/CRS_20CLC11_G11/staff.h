@@ -59,7 +59,7 @@ void displayScoreboardConsole(_course* course);
 void inputScoreboard();
 void viewScoreboardCourse();
 void viewScoreboardClass();
-void editScore();
+void editScoreFromCourse();
 
 void createCourse(); //menu manage course
 

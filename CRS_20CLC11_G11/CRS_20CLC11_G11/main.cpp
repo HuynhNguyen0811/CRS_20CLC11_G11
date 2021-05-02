@@ -15,8 +15,10 @@ int main() {
 
 	//viewAttendStudent();
 	//writeAttendStudent();
+
+	viewScoreboardCourse();
 	
-	inputScoreboard();
+	//inputScoreboard();
 
 	/*unsigned long long ID = NULL;
 	string className = "";

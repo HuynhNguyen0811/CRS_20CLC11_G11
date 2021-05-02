@@ -494,7 +494,7 @@ void writeIndividualCourseFile(string path, course pHead) {
 
 	_studentRegis* pCur = pHead.studentID;
 	while (pCur != nullptr && pCur->pNext != nullptr) {
-		fileOut << pCur->data << "," << pCur->total << "," << pCur->final << "," << pCur->mid << "," << pCur->other << "," << pCur->gpa << endl;
+		fileOut << pCur->data << "," << pCur->total << "," << pCur->final << "," << pCur->mid << "," << pCur->other << "," << pCur->gpa << ",,,,," << endl;
 		pCur = pCur->pNext;
 	}
 
@@ -999,7 +999,7 @@ void displayScoreboardConsole(_course* course) {
 	_studentRegis* pCur = course->data.studentID;
 	_LText();
 	while (pCur != nullptr && pCur->pNext != nullptr) {
-		wcout << pCur->no << " ";
+		//wcout << pCur->no << " ";
 		wcout << pCur->data << " ";
 		wcout << pCur->name << " ";
 		wcout << pCur->total << " ";
@@ -1032,7 +1032,7 @@ void writeScoreboardAllIndividualStu(_course* course) {
 		while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
 			while (pCurAccount != nullptr && pCurAccount->pNext != nullptr) {
 				if (pCurStu->data == pCurAccount->data.Student_ID) {
-					cout << "Found out" << endl;
+					//cout << "Found out" << endl;
 					//co ID, co class cua sv
 					path = "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv";
 					//mo file cua sinh vien do
@@ -1102,7 +1102,74 @@ void inputScoreboard() {
 	deleteListCourse(pHead);
 }
 
+//chua chia ham
 void viewScoreboardCourse() {
+	//read course list
+	_course* pHead = nullptr, * pEdit;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv", path;
+
+	readCourseFile(FolderPath + coursePath, pHead);
+	readAllIndividualCourseFile(FolderPath, pHead);
+
+	_account* pHeadAccount = nullptr;
+	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
+
+	//display list of courses
+	cout << "Course's information list: " << endl;
+	displayCourseConsole(pHead);
+
+	//choose course
+	unsigned long long tempID;
+	_studentRegis* pCurStu;
+	_account* pCurAccount;
+	_course* pDisplay;
+	int temp = 1;
+
+	wifstream fileIn;
+	wstring firstName, lastName, fullName, stringTemp;
+	wstring tempRead;
+	wchar_t a = ',';
+
+	while (temp != 0) {
+		cout << "Enter the ID of the course you want to view student list: ";
+		cin >> tempID;
+		pDisplay = findCourse(tempID, pHead); //have list of attend student's ID
+
+		pCurStu = pDisplay->data.studentID;
+		pCurAccount = pHeadAccount;
+		while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
+			while (pCurAccount != nullptr && pCurAccount->pNext != nullptr) {
+				if (pCurStu->data == pCurAccount->data.Student_ID) {
+					//open doc file blum bla
+					path = "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv";
+					fileIn.open(path, ios_base::in);
+					fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+					getline(fileIn, stringTemp, a);
+					getline(fileIn, firstName, a);
+					getline(fileIn, lastName, a);
+					fullName = firstName + L" " + lastName;
+					pCurStu->name = fullName;
+
+					fileIn.close();
+
+				}
+				pCurAccount = pCurAccount->pNext;
+			}
+			//cout << "\n\t1" << pCurStu->data;
+			
+			pCurStu = pCurStu->pNext;
+			pCurAccount = pHeadAccount;
+		}
+
+		cout << "Scoreboard: \n";
+		displayScoreboardConsole(pDisplay);
+		
+		cout << "Enter 0 to escape: ";
+		cin >> temp;
+	}
+	//thieu delete studentRegis
+	deleteListCourse(pHead);
 
 }
 
@@ -1114,6 +1181,7 @@ void editScoreFromCourse() {
 
 }
 
+//khong can
 void editScoreFromClass() {
 
 }
