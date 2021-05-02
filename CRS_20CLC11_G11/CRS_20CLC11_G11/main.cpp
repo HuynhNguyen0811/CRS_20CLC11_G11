@@ -17,6 +17,8 @@ int main() {
 	//writeAttendStudent();
 
 	viewScoreboardCourse();
+	editScoreFromCourse();
+	viewScoreboardCourse();
 	
 	//inputScoreboard();
 

@@ -1085,7 +1085,6 @@ void inputScoreboard() {
 	cin >> tempID;
 	//find course
 	pEdit = findCourse(tempID, pHead);
-	cout << pEdit->data.courseId << endl;
 
 	//input file name
 	cout << "Enter the name of file you want to import: ";
@@ -1105,7 +1104,7 @@ void inputScoreboard() {
 //chua chia ham
 void viewScoreboardCourse() {
 	//read course list
-	_course* pHead = nullptr, * pEdit;
+	_course* pHead = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv", path;
 
 	readCourseFile(FolderPath + coursePath, pHead);
@@ -1131,7 +1130,7 @@ void viewScoreboardCourse() {
 	wchar_t a = ',';
 
 	while (temp != 0) {
-		cout << "Enter the ID of the course you want to view student list: ";
+		cout << "Enter the ID of the course you want to view scoreboard: ";
 		cin >> tempID;
 		pDisplay = findCourse(tempID, pHead); //have list of attend student's ID
 
@@ -1168,9 +1167,9 @@ void viewScoreboardCourse() {
 		cout << "Enter 0 to escape: ";
 		cin >> temp;
 	}
+
 	//thieu delete studentRegis
 	deleteListCourse(pHead);
-
 }
 
 void viewScoreboardClass() {
@@ -1178,7 +1177,89 @@ void viewScoreboardClass() {
 }
 
 void editScoreFromCourse() {
+	//read course list
+	_course* pHead = nullptr;
+	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv", path;
 
+	readCourseFile(FolderPath + coursePath, pHead);
+	readAllIndividualCourseFile(FolderPath, pHead);
+
+	_account* pHeadAccount = nullptr;
+	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
+
+	//display list of courses
+	cout << "Course's information list: " << endl;
+	displayCourseConsole(pHead);
+
+	//choose course
+	unsigned long long tempID, tempStuID;
+	_account* pCurAccount;
+	_studentRegis* pCurStu;
+	_score* pCurScore;
+	_course* pEdit;
+	student stu;
+	double total, final, mid, other, gpa;
+
+	wifstream fileIn;
+
+	cout << "Enter the ID of the course you want to edit scoreboard: ";
+	cin >> tempID;
+	pEdit = findCourse(tempID, pHead); //have list of attend student's ID
+	cout << "Enter the ID of the student you want to edit: ";
+	cin >> tempStuID;
+
+	//edit file sinh vien
+	pCurAccount = pHeadAccount;
+	while (pCurAccount != nullptr && pCurAccount->pNext != nullptr) {
+		if (tempStuID == pCurAccount->data.Student_ID) {
+			//load thong tin sinh vien
+			stu = findInfoStudent(pCurAccount->data.Student_ID, pCurAccount->data.className);
+
+			pCurScore = stu.score;
+			while (pCurScore != nullptr && pCurScore->pNext != nullptr) {
+
+				//edit
+				if (tempID == pCurScore->data.course_ID) {
+					cout << "Old score: ";
+					cout << "Total: " << pCurScore->data.total << " Final: " << pCurScore->data.final << " Mid: " << pCurScore->data.mid << " Other: " << pCurScore->data.other << " GPA: " << pCurScore->data.gpa << endl;
+					cout << "New score: ";
+					cin >> total >> final >> mid >> other >> gpa;
+					pCurScore->data.total = total;
+					pCurScore->data.final = final;
+					pCurScore->data.mid = mid;
+					pCurScore->data.other = other;
+					pCurScore->data.gpa = gpa;
+					//rewrite student file
+					createStudentFile(stu, pCurAccount->data.className);
+					break;
+				}
+				pCurScore = pCurScore->pNext;
+			}
+			break;
+		}
+		pCurAccount = pCurAccount->pNext;
+	}
+
+	//edit file course
+	pCurStu = pEdit->data.studentID;
+	while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
+		if (tempStuID == pCurStu->data) {
+			pCurStu->total = total;
+			pCurStu->final = final;
+			pCurStu->mid = mid;
+			pCurStu->other = other;
+			pCurStu->gpa = gpa;
+			//rewrite course file
+			path = FolderPath + to_string(pEdit->data.courseId) + fileFormat;
+			writeIndividualCourseFile(path, pEdit->data);
+			break;
+		}
+		pCurStu = pCurStu->pNext;
+	}
+
+
+	//thieu delete studentRegis
+	deleteListCourse(pHead);
 }
 
 //khong can
