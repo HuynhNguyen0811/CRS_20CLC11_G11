@@ -15,11 +15,14 @@
 
 #include <conio.h> //getch
 
+#include <iomanip>
+
 using namespace std;
 
 void GotoXY(int x, int y);
 void ShowCur(bool CursorVisibility);
 void textColor(int k);
+void resizeConsole(int x, int y);
 
 void _LText();
 void _SText();

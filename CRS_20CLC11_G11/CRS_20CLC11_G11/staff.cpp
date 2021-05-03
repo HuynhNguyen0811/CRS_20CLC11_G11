@@ -321,11 +321,11 @@ void readCourseFile(string path, _course*& pHead) {
 	wifstream fileIn;
 	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-	fileIn.ignore(1000, wchar_t(0xfeff));
+	/*fileIn.ignore(1000, wchar_t(0xfeff));
 
 	fileIn.seekg(0, ios_base::end);
 	int end = fileIn.tellg();
-	fileIn.seekg(0, ios_base::beg);
+	fileIn.seekg(0, ios_base::beg);*/
 
 	if (fileIn.fail())
 	{
@@ -1174,6 +1174,136 @@ void viewScoreboardCourse() {
 
 void viewScoreboardClass() {
 
+	//load class and full course
+	string folderPath = "Data\\", fileFormat = ".csv", path;
+	string coursePath = "Course\\", courseListPath = "Course.csv";
+	string classPath = "Classes\\", classListPath = "Class_Name.csv";
+
+	_Class* pHeadClass = nullptr;
+	path = folderPath + classPath + classListPath;
+	cout << path << endl;
+	readClassName(path, pHeadClass);
+	_course* pHeadCourse = nullptr, *pCurCourse = nullptr;
+	path = folderPath + coursePath + courseListPath;
+	cout << path << endl;
+	readCourseFile(path, pHeadCourse);
+	_score* pCurScore = nullptr;
+
+	//choose class
+	string chooseClass;
+	displayClassName(pHeadClass);
+	cout << "Enter class name you want to view scoreboard: ";
+	cin >> chooseClass;
+
+	//create a linked list contain stu info in that class
+	_student* pHeadStu = nullptr, * pCurStu = nullptr;
+
+	//already had a function
+	readStuInClass(folderPath + classPath + chooseClass + fileFormat, pHeadStu);
+
+	//run over again and load individual course of that stu
+	wifstream fileIn;
+	wstring tempCourseID;
+	wchar_t a = ',';
+	pCurStu = pHeadStu;
+
+	int dem = 0;
+	//while loop and then read using findInfoStudent(ID, chooseClass)
+	while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
+		fileIn.open(folderPath + classPath + chooseClass + "\\" + to_string(pCurStu->data.Student_ID) + fileFormat);
+		if (fileIn.fail()) {
+			pCurStu = pCurStu->pNext;
+			continue;
+		}
+		dem++;
+
+		fileIn.ignore(1000, '\n');
+		while (fileIn) {
+			if (pCurStu->data.score == nullptr) {
+				pCurStu->data.score = new _score;
+				pCurScore = pCurStu->data.score;
+			}
+			else {
+				pCurScore->pNext = new _score;
+				pCurScore = pCurScore->pNext;
+			}
+			getline(fileIn, tempCourseID, a);
+			pCurScore->data.course_ID = wstringToLong(tempCourseID);
+			fileIn >> pCurScore->data.total >> a;
+			fileIn >> pCurScore->data.final >> a;
+			fileIn >> pCurScore->data.mid >> a;
+			fileIn >> pCurScore->data.other >> a;
+			fileIn >> pCurScore->data.gpa;
+
+			pCurScore->pNext = nullptr;
+		}
+		pCurStu = pCurStu->pNext;
+		fileIn.close();
+	}
+	//got the data we need
+	/*displayStuInClassConsole(pHeadStu);
+	system("PAUSE");*/
+	/*GotoXY(0, 0);
+	cout << dem;
+	system("PAUSE");*/
+	cout << dem;
+	system("CLS");
+	resizeConsole(1200, 600);
+	//while for loop student
+	pCurStu = pHeadStu;
+	while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
+		//gotoXY
+		//cout No and name
+		GotoXY(0, pCurStu->data.No);
+		cout << pCurStu->data.No;
+		GotoXY(5, pCurStu->data.No);
+		_LText();
+		wcout << pCurStu->data.FirstName << " " << pCurStu->data.LastName;
+		_SText();
+		//while for loop all course
+		pCurCourse = pHeadCourse;
+		int i = 20;
+		double overallGPA = 0;
+		int count = 0;
+		while (pCurCourse != nullptr && pCurCourse->pNext != nullptr) {
+			//while for loop course that student attends
+			i += 12;
+			GotoXY(i + 5, 0);
+			cout << pCurCourse->data.courseId;
+			pCurScore = pCurStu->data.score;
+			while (pCurScore != nullptr && pCurScore->pNext != nullptr) {
+				//if have that course -> cout score, if not -> cout << X	
+				if (pCurCourse->data.courseId == pCurScore->data.course_ID) {
+					//gotoXY
+					//cout score
+					GotoXY(i, pCurStu->data.No);
+					cout << fixed << setprecision(2) << pCurScore->data.final;
+					GotoXY(i + 6, pCurStu->data.No);
+					cout << fixed << setprecision(2) << pCurScore->data.gpa;
+					count++;
+					overallGPA += pCurScore->data.gpa;
+					break;
+				}
+				pCurScore = pCurScore->pNext;
+			}
+			if (pCurScore == nullptr || pCurScore->pNext == nullptr) {
+				//gotoXY
+				//cout X
+				GotoXY(i, pCurStu->data.No);
+				cout << "  X  ";
+				GotoXY(i + 6, pCurStu->data.No);
+				cout << "  X  ";
+			}
+			pCurCourse = pCurCourse->pNext;
+		}
+		GotoXY(i + 12, 0);
+		cout << "Total";
+		GotoXY(i + 12, pCurStu->data.No);
+		if (count != 0) cout << fixed << setprecision(2) << overallGPA / count;
+		if (count == 0) cout << "  X  ";
+		pCurStu = pCurStu->pNext;
+	}
+	//a lot of delete
 }
 
 void editScoreFromCourse() {
@@ -1260,9 +1390,4 @@ void editScoreFromCourse() {
 
 	//thieu delete studentRegis
 	deleteListCourse(pHead);
-}
-
-//khong can
-void editScoreFromClass() {
-
 }

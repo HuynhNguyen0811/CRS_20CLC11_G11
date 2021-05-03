@@ -25,6 +25,13 @@ void textColor(int k) {
 	SetConsoleTextAttribute(hConsoleColor, k);
 }
 
+void resizeConsole(int x, int y) {
+	RECT r;
+	HWND console = GetConsoleWindow();
+	GetWindowRect(console, &r);
+	MoveWindow(console, r.left, r.top, x, y, TRUE);
+}
+
 void _LText() //chuyen sang tieng viet
 {
 	_setmode(_fileno(stdin), _O_U16TEXT);
