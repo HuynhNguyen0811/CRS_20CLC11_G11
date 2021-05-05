@@ -4,20 +4,25 @@
 #include "struct.h"
 #include "bigData.h"
 
-void menuStaff();
-
+void deleteListStudent(_student*& pHead);
 void deleteListCourse(_course*& pHead);
 void deleteListClass(_Class*& pHead);
 void deleteListStudentAttend(_studentRegis* &pHead);
 
+//class
 void readStuInClass(string path, _student*& pHead);
 void readClassName(string path, _Class*& pHeadClass);
+
+void readFileStudent(string& path, _student*& pHead);
+void createClassListFile(string path, string className);
+void createLogInStudent(string path, _student* pHead, string classname);
+void writeFileStudent(string path, _student* pHead);
+
 void displayClassName(_Class* pHead);
 
-void AtTheBeginningOfSchoolYear();
-void AtTheBeginningOfSemester();
-void displayClassAndStudent();
+void inputClass();
 
+//course
 void inputFromKeyboardCourse(_course*& pHead);
 
 _studentRegis* takeTailStudentRegis(_studentRegis* pHead);
@@ -50,6 +55,7 @@ void removeCourse();
 void viewAttendStudent();
 void writeAttendStudent();
 
+//score
 void readScoreboard(string path, _course*& course);
 
 void writeScoreboardAllIndividualStu(_course* course);
@@ -62,5 +68,7 @@ void viewScoreboardClass();
 void editScoreFromCourse();
 
 void createCourse(); //menu manage course
+
+void menuStaff();
 
 #endif

@@ -44,13 +44,13 @@
     <ClCompile Include="staff.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="commonFunc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="bigData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="graphic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="commonFunc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

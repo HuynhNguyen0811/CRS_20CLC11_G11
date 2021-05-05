@@ -152,3 +152,46 @@ int countLine(string path) {
 	for (line = 0; getline(fileIn, temp); line++);
 	return line;
 }
+
+Date getSystemDate() {
+	Date a;
+	time_t today;
+	time(&today);
+	tm Today = *localtime(&today);
+	a.day = Today.tm_mday;
+	a.month = Today.tm_mon + 1;
+	a.year = Today.tm_year + 1900;
+	return a;
+}
+
+bool operator>= (const Date& a, const Date& b) {
+	if (a.year > b.year)
+		return true;
+	if (a.year < b.year)
+		return false;
+	if (a.month > b.month)
+		return true;
+	if (a.month < b.month)
+		return false;
+	if (a.day > b.day)
+		return true;
+	if (a.day < b.day)
+		return false;
+	return true;
+}
+
+bool operator<= (const Date& a, const Date& b) {
+	if (a.year < b.year)
+		return true;
+	if (a.year > b.year)
+		return false;
+	if (a.month < b.month)
+		return true;
+	if (a.month > b.month)
+		return false;
+	if (a.day < b.day)
+		return true;
+	if (a.day > b.day)
+		return false;
+	return true;
+}

@@ -2,6 +2,15 @@
 #include "student.h"
 #include "commonFunc.h"
 
+void deleteListStudent(_student*& pHead) {
+	_student* pTmp = pHead;
+	while (pHead != nullptr) {
+		pHead = pHead->pNext;
+		delete pTmp;
+		pTmp = pHead;
+	}
+}
+
 void deleteListClass(_Class*& pHead) {
 	_Class* pTmp = pHead;
 	while (pHead != nullptr) {
@@ -16,6 +25,7 @@ void deleteListCourse(_course*& pHead) {
 	while (pHead != nullptr) {
 		delete[] pHead->data.session;
 		pHead = pHead->pNext;
+		deleteListStudentAttend(pTmp->data.studentID);
 		delete pTmp;
 		pTmp = pHead;
 	}
@@ -28,6 +38,50 @@ void deleteListStudentAttend(_studentRegis* &pHead) {
 		delete pTmp;
 		pTmp = pHead;
 	}
+}
+
+void readFileStudent(string& path, _student*& pHead) {
+	wifstream fileIn;
+	do {
+		cout << "Please enter the name of the file you want to input: ";
+		cin >> path;
+
+		fileIn.open(path + ".csv", ios_base::in);
+		fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+		if (fileIn.fail())
+		{
+			cout << "File is not existed " << endl;
+		}
+	} while (fileIn.fail());
+
+	_student* pCur = nullptr;
+	wstring temp;
+	wchar_t a = ',';
+	//getline(fileIn, temp, char(191));
+	while (fileIn) {
+		if (pHead == nullptr) {
+			pHead = new _student;
+			pCur = pHead;
+		}
+		else {
+			pCur->pNext = new _student;
+			pCur = pCur->pNext;
+		}
+		getline(fileIn, temp, a);
+		pCur->data.No = wstringToInt(temp);
+		getline(fileIn, temp, a);
+		pCur->data.Student_ID = wstringToLong(temp);
+
+		getline(fileIn, pCur->data.FirstName, a);
+		getline(fileIn, pCur->data.LastName, a);
+		getline(fileIn, pCur->data.Gender, a);
+		getline(fileIn, temp, a);
+		pCur->data.Date_Of_Birth = wstringToDate(temp);
+		fileIn >> pCur->data.Social_ID;
+		pCur->pNext = nullptr;
+	}
+	fileIn.close();
 }
 
 void readStuInClass(string path, _student* &pHead) {
@@ -110,8 +164,40 @@ void createClassListFile(string path, string className) {
 	fileOut.close();
 }
 
+void createLogInStudent(string path, _student* pHead, string classname) {
+	ofstream fileOut;
+	fileOut.open(path + ".csv", ios_base::app);
+	string pass, zero = "0";
+	while (pHead->pNext != nullptr) {
+		fileOut << pHead->data.Student_ID << ",";
+
+		if (pHead->data.Date_Of_Birth.day < 10) pass = zero + to_string(pHead->data.Date_Of_Birth.day);
+		else pass = to_string(pHead->data.Date_Of_Birth.day);
+		if (pHead->data.Date_Of_Birth.month < 10) pass += zero + to_string(pHead->data.Date_Of_Birth.month);
+		else pass += to_string(pHead->data.Date_Of_Birth.month);
+		pass += to_string(pHead->data.Date_Of_Birth.year);
+
+		fileOut << pass << ",";
+		fileOut << classname << endl;
+
+		pHead = pHead->pNext;
+	}
+	fileOut.close();
+}
+
+void writeFileStudent(string path, _student* pHead) {
+	wofstream fileOut;
+	fileOut.open(path, ios_base::out);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+	while (pHead->pNext != nullptr) {
+		fileOut << pHead->data.No << L"," << pHead->data.Student_ID << L"," << pHead->data.FirstName << L"," << pHead->data.LastName << L"," << pHead->data.Gender << L"," << pHead->data.Date_Of_Birth.day << wchar_t(47) << pHead->data.Date_Of_Birth.month << wchar_t(47) << pHead->data.Date_Of_Birth.year << L"," << pHead->data.Social_ID << endl;
+		pHead = pHead->pNext;
+	}
+	fileOut.close();
+}
+
 //doi lai ten ham 
-void AtTheBeginningOfSchoolYear() {
+void inputClass() {
 	system("CLS");
 	//SchoolYear sy;
 	_student* pHead = nullptr;
@@ -152,7 +238,7 @@ void AtTheBeginningOfSchoolYear() {
 				break;
 			}
 		}
-		menuStaff();
+		//menuStaff();
 		break;
 	case 2:
 		cout << "Please enter file name that contains class name: ";
@@ -183,45 +269,6 @@ void AtTheBeginningOfSchoolYear() {
 		//menuStaff();
 		break;
 	}
-} 
-
-void menuStaff() {
-	system("CLS");
-	cout << "Log in as staff successfull";
-	int flag;
-	cin >> flag;
-	switch (flag) {
-	case 1:
-		break;
-	case 2:
-		break;
-	case 3:
-		break;
-	}
-}
-
-//doi lai ten ham
-void AtTheBeginningOfSemester() {
-	int* flag = new int;
-	cout << "Choose:\n1. Create semester\n2. Create a course registration\n3. Add a course\n4. View list of courses\n5. Update course infomation\n6. Delete course";
-	cin >> *flag;
-	switch (*flag) {
-	case 1:
-		break;
-	case 2:
-		break;
-	case 3:
-		break;
-	case 4:
-		break;
-	case 5:
-		break;
-	case 6:
-		break;
-	default:
-		break;
-	}
-	delete flag;
 } 
 
 void displayClassAndStudent() {
@@ -1181,12 +1228,12 @@ void viewScoreboardClass() {
 
 	_Class* pHeadClass = nullptr;
 	path = folderPath + classPath + classListPath;
-	cout << path << endl;
 	readClassName(path, pHeadClass);
+
 	_course* pHeadCourse = nullptr, *pCurCourse = nullptr;
 	path = folderPath + coursePath + courseListPath;
-	cout << path << endl;
 	readCourseFile(path, pHeadCourse);
+
 	_score* pCurScore = nullptr;
 
 	//choose class
@@ -1241,11 +1288,7 @@ void viewScoreboardClass() {
 		fileIn.close();
 	}
 	//got the data we need
-	/*displayStuInClassConsole(pHeadStu);
-	system("PAUSE");*/
-	/*GotoXY(0, 0);
-	cout << dem;
-	system("PAUSE");*/
+	
 	cout << dem;
 	system("CLS");
 	resizeConsole(1200, 600);
@@ -1390,4 +1433,8 @@ void editScoreFromCourse() {
 
 	//thieu delete studentRegis
 	deleteListCourse(pHead);
+}
+
+void menuStaff() {
+
 }

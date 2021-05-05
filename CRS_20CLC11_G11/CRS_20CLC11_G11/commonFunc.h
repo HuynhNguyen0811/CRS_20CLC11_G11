@@ -8,14 +8,19 @@
 
 #include <fstream>
 
+//lay tgian
+#include <time.h> 
+
+//lam tron
 #include <cmath>
+#include <iomanip>
 
 #include<io.h> //utf
 #include <fcntl.h>
 
 #include <conio.h> //getch
 
-#include <iomanip>
+#include <direct.h> //create folder
 
 using namespace std;
 
@@ -39,5 +44,9 @@ void wstringToWchar(wchar_t* destination, wstring source);
 void stringToChar(char* destination, string source);
 
 int countLine(string path);
+
+Date getSystemDate();
+bool operator>= (const Date& a, const Date& b);
+bool operator<= (const Date& a, const Date& b);
 
 #endif
