@@ -67,8 +67,12 @@ void viewScoreboardCourse();
 void viewScoreboardClass();
 void editScoreFromCourse();
 
-void createCourse(); //menu manage course
+//sub menu
+void menuManageStudent();
+void menuManageCourse();
+void menuManageScore();
 
+//main menu
 void menuStaff();
 
 #endif

@@ -780,31 +780,6 @@ void removeCourse() {
 	deleteListCourse(pHead);
 }
 
-//main menu manage course
-void createCourse() {
-	int flag = -1;
-	while (flag != 0) {
-		cout << "1. Input course from keyboard\n2. Input course from file .csv\n3. Edit course's information\n4. Remove course\n0. Escape\n";
-		cin >> flag;
-		switch (flag) {
-		case 1:
-			createCourseFromKeyboard();
-			break;
-		case 2:
-			createCourseFromFile();
-			break;
-		case 3:
-			editCourse();
-			break;
-		case 4:
-			removeCourse();
-			break;
-		default:
-			break;
-		}
-	}
-}
-
 //chua chia ham
 void viewAttendStudent() {
 	_course* pHead = nullptr, * pEdit;
@@ -1435,6 +1410,143 @@ void editScoreFromCourse() {
 	deleteListCourse(pHead);
 }
 
+void menuManageStudent() {
+
+	//choose school year
+
+	int temp = 1;
+	while (temp != '0') {
+		system("CLS");
+		cout << "1. Input class\n2. View class\n0. Escape\n\n";
+		temp = _getch();
+		switch (temp) {
+		case '1':
+			break;
+		case '2':
+			break;
+		default:
+			break;
+		}
+		//if (temp == '0') break;
+		//temp = _getch();
+		system("PAUSE");
+	}
+}
+
+void menuManageCourse() {
+
+	//choose school year
+	//choose sem
+
+	int temp = 1;
+	while (temp != '0') {
+		system("CLS");
+		cout << "1. Input course\n2. View course\n3. Edit course\n4.Remove course\n0. Escape\n\n";
+		temp = _getch();
+		switch (temp) {
+		case '1':
+		{
+			//choose method
+			int tempSub;
+			cout << "1. Input from keyboard\n2. Input from file\n0. Escape\n\n";
+			tempSub = _getch();
+			switch (tempSub) {
+			case '1':
+				createCourseFromKeyboard();
+				break;
+			case '2':
+				createCourseFromFile();
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+		case '2': {
+			_course* pHead = nullptr;
+			string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+			readCourseFile(FolderPath + coursePath, pHead);
+			cout << "Course's information list: " << endl;
+			displayCourseConsole(pHead);
+			break;
+		}
+		case '3':
+			editCourse();
+			break;
+		case '4':
+			removeCourse();
+			break;
+		default:
+			break;
+		}
+		//if (temp == '0') break;
+		//temp = _getch();
+		system("PAUSE");
+	}
+}
+
+void menuManageScore() {
+
+	//choose school year
+	//choose sem
+
+	int temp = 1;
+	while (temp != '0') {
+		system("CLS");
+		cout << "1. Input score\n2. View score\n3. Edit score\n0. Escape\n\n";
+		temp = _getch();
+		switch (temp) {
+		case '1':
+			inputScoreboard();
+			break;
+		case '2': {
+			//choose method
+			int tempSub;
+			cout << "1. View course scoreboard\n2. View class score\n0. Escape\n\n";
+			tempSub = _getch();
+			switch (tempSub) {
+			case '1':
+				viewScoreboardCourse();
+				break;
+			case '2':
+				viewScoreboardClass();
+				break;
+			default:
+				break;
+			}
+			break; 
+		}
+		case '3':
+			break;
+		default:
+			break;
+		}
+		//if (temp == '0') break;
+		//temp = _getch();
+		system("PAUSE");
+	}
+}
+
 void menuStaff() {
+	int temp = 1;
+	while (temp != '0') {
+		system("CLS");
+		cout << "1. Manage student\n2. Manage course\n3. Manage score\n0. Escape\n\n";
+		temp = _getch();
+		switch (temp) {
+		case '1':
+			menuManageStudent();
+			break;
+		case '2':
+			menuManageCourse();
+			break;
+		case '3':
+			menuManageScore();
+			break;
+		default:
+			break;
+		}
+		//if (temp == '0') break;
+	}
 
 }

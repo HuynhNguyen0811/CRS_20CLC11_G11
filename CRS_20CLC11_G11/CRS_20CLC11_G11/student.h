@@ -15,10 +15,12 @@ void printScoreboard(student stu);
 void editFilePassword(string path, unsigned long long ID, string className, string newPassword);
 void changePassword(unsigned long long ID, string className);
 
-bool checkLogin(string path, unsigned long long ID, string password, string& className);
+bool checkLoginStudent(string path, unsigned long long ID, string password);
+bool checkLoginStaff(string path, string ID, string password);
 
-void login(unsigned long long& ID, string& className);
+void login();
 
+//after login
 void createStudentFile(student stu, string className);
 void createStudentFileWithout1Course(student stu, string className, unsigned long long course_ID);
 

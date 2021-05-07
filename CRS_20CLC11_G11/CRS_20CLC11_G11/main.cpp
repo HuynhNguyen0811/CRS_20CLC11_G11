@@ -11,24 +11,10 @@ int main() {
 	_CrtSetReportFile(_CRT_ERROR, _CRTDBG_FILE_STDOUT);
 	_CrtSetReportMode(_CRT_ASSERT, _CRTDBG_MODE_FILE);
 	_CrtSetReportFile(_CRT_ASSERT, _CRTDBG_FILE_STDOUT);
-	//cout << countLine("Course.csv");
 
-	//createCourse();
+	login();
 
-	//AtTheBeginningOfSchoolYear();
-
-	//displayClassAndStudent();
-
-	//viewAttendStudent();
-	//writeAttendStudent();
-
-	viewScoreboardClass();
-
-	/*viewScoreboardCourse();
-	editScoreFromCourse();
-	viewScoreboardCourse();*/
-	
-	//inputScoreboard();
+	//menuStaff();
 
 	/*unsigned long long ID = NULL;
 	string className = "";
