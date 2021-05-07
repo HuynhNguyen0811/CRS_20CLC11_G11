@@ -15,7 +15,7 @@ void printScoreboard(student stu);
 void editFilePassword(string path, unsigned long long ID, string className, string newPassword);
 void changePassword(unsigned long long ID, string className);
 
-bool checkLoginStudent(string path, unsigned long long ID, string password);
+bool checkLoginStudent(string path, unsigned long long ID, string password, string & className);
 bool checkLoginStaff(string path, string ID, string password);
 
 void login();

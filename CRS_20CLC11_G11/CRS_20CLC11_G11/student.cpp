@@ -46,9 +46,9 @@ void deleteTimeTable(student& stu) {
 
 void login() {
 	system("CLS");
-	int flag, out;
+	int flag = 1, out;
 	long IDStudent = NULL;
-	string temp, ClassName;
+	string temp, className;
 	string IDStaff;
 	string password = "";
 	bool check = 0;
@@ -74,94 +74,19 @@ void login() {
 				cout << "Password: ";
 				cin >> password;
 				path = folderName + "passStudent" + fileFormat;
-				if (checkLoginStudent(path, IDStudent, password) == 1)
-				{
-					ifstream fileIn;
-					fileIn.open(path, ios_base::in);
-					unsigned long long tempID = NULL, checkID = NULL;
-					while (fileIn)
-					{
-						getline(fileIn, temp, ',');
-						getline(fileIn, temp, ',');
-						fileIn >> ClassName;
-					}
-					fileIn.close();
-				}
-				check = checkLoginStudent(path, IDStudent, password);
+				check = checkLoginStudent(path, IDStudent, password, className);
 			}
+			check = 0;
 			system("CLS");
-			menuStudent(IDStudent, ClassName);
+			menuStudent(IDStudent, className);
 			break;
 		case 2:
 			while (check == 0) {
 				if (IDStaff != "" && password != "") {
 					cout << "Please enter again\n";
 					cout << "Enter 0 if you want to come back to main menu: ";
-					int flag, out;
-					long IDStudent = NULL;
-					string temp, ClassName;
-					string IDStaff;
-					string password = "";
-					bool check = 0;
-					string path;
-					string folderName = "Data\\";
-					string pathSub = "Classes\\", fileFormat = ".csv";
-
-					cout << "Login as student or staff: \n1.Student\n2.Staff\nEnter any others value to escape\n";
-					cin >> flag;
-					switch (flag) {
-					case 1:
-						while (check == 0) {
-							if (IDStudent != NULL && password != "") {
-								cout << "Please enter again\n";
-								cout << "Enter 0 if you want to come back to main menu: ";
-								cin >> out;
-								if (out == 0) login();
-							}
-							cout << "ID: ";
-							cin >> IDStudent;
-							cout << "Password: ";
-							cin >> password;
-							path = folderName + "passStudent" + fileFormat;
-							if (checkLoginStudent(path, IDStudent, password) == 1)
-							{
-								ifstream fileIn;
-								fileIn.open(path, ios_base::in);
-								unsigned long long tempID = NULL, checkID = NULL;
-								while (fileIn)
-								{
-									getline(fileIn, temp, ',');
-									getline(fileIn, temp, ',');
-									fileIn >> ClassName;
-								}
-								fileIn.close();
-							}
-							check = checkLoginStudent(path, IDStudent, password);
-						}
-						system("CLS");
-						menuStudent(IDStudent, ClassName);
-						break;
-					case 2:
-						while (check == 0) {
-							if (IDStaff != "" && password != "") {
-								cout << "Please enter again\n";
-								cout << "Enter 0 if you want to come back to main menu: ";
-								cin >> out;
-								if (out == 0) login();
-							}
-							cout << "ID: ";
-							cin >> IDStaff;
-							cout << "Password: ";
-							cin >> password;
-							path = folderName + "passStaff" + fileFormat;
-							check = checkLoginStaff(path, IDStaff, password);
-						}
-						system("CLS");
-						menuStaff();
-						break;
-					default:
-						break;
-					}
+					cin >> out;
+					if (out == 0) break;
 				}
 				cout << "ID: ";
 				cin >> IDStaff;
@@ -170,6 +95,8 @@ void login() {
 				path = folderName + "passStaff" + fileFormat;
 				check = checkLoginStaff(path, IDStaff, password);
 			}
+			check = 0;
+			IDStaff = password = "";
 			system("CLS");
 			menuStaff();
 			break;
@@ -239,7 +166,7 @@ void printScoreboard(student stu) {
 	}
 }
 
-bool checkLoginStudent(string path, unsigned long long ID, string password) {
+bool checkLoginStudent(string path, unsigned long long ID, string password, string& className) {
 	ifstream fileIn;
 	fileIn.open(path, ios_base::in);
 
@@ -251,11 +178,13 @@ bool checkLoginStudent(string path, unsigned long long ID, string password) {
 		getline(fileIn, tempPassword, ',');
 		fileIn >> tempClassName;
 		if (tempID == ID) {
+			className = tempClassName;
 			checkID = tempID;
 			checkPassword = tempPassword;
 		}
 	}
 	if (checkID == ID && checkPassword == password) {
+		className = tempClassName;
 		fileIn.close();
 		return 1;
 	}
@@ -273,20 +202,15 @@ bool checkLoginStaff(string path, string ID, string password) {
 	while (fileIn) {
 		getline(fileIn, tempID, ',');
 		fileIn >> tempPassword;
-		if (tempID == ID) {
-			checkID = tempID;
-			checkPassword = tempPassword;
+
+		if (tempID == ID && tempPassword == password)
+		{
+			fileIn.close();
+			return 1;
 		}
 	}
-	if (checkID == ID && checkPassword == password)
-	{
-		fileIn.close();
-		return 1;
-	}
-	{
-		fileIn.close();
-		return 0;
-	}
+	fileIn.close();
+	return 0;
 }
 
 void editFilePassword(string path, unsigned long long ID, string className, string newPassword) {
