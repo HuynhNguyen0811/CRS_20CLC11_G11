@@ -14,12 +14,6 @@ int main() {
 
 	login();
 
-	//menuStaff();
-
-	/*unsigned long long ID = NULL;
-	string className = "";
-	login(ID, className);*/
-
 	if (_CrtDumpMemoryLeaks())
 	{
 		std::cout << "Leak";

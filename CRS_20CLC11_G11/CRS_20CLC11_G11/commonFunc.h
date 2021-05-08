@@ -48,5 +48,7 @@ int countLine(string path);
 Date getSystemDate();
 bool operator>= (const Date& a, const Date& b);
 bool operator<= (const Date& a, const Date& b);
+bool operator== (const Date& a, const Date& b);
+bool operator!= (const Date& a, const Date& b);
 
 #endif

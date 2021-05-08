@@ -195,3 +195,11 @@ bool operator<= (const Date& a, const Date& b) {
 		return false;
 	return true;
 }
+
+bool operator== (const Date& a, const Date& b) {
+	return a.day == b.day && a.month == b.month && a.year == b.year;
+}
+
+bool operator!= (const Date& a, const Date& b) {
+	return a.day != b.day || a.month != b.month || a.year != b.year;
+}

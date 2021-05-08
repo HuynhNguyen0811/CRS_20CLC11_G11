@@ -154,16 +154,29 @@ void printInfoStudent(student stu) {
 	_SText();
 }
 
-void printScoreboard(student stu) {
-	while (stu.score != nullptr && stu.score->pNext != nullptr) {
-		cout << stu.score->data.course_ID << " ";
-		cout << stu.score->data.total << " ";
-		cout << stu.score->data.final << " ";
-		cout << stu.score->data.mid << " ";
-		cout << stu.score->data.other << " ";
-		cout << stu.score->data.gpa << endl;
-		stu.score = stu.score->pNext;
+void printScoreboardInSem(student stu, _course* pHeadCourse, Date start, Date end) {
+	_score* pCurScore;
+	while (pHeadCourse != nullptr && pHeadCourse->pNext != nullptr) {
+		pCurScore = stu.score;
+		while (pCurScore != nullptr && pCurScore->pNext != nullptr) {
+			if (pCurScore->data.course_ID == pHeadCourse->data.courseId && start == pHeadCourse->data.startRegis) {
+				cout << pCurScore->data.course_ID << " ";
+				_LText();
+				wcout << pHeadCourse->data.courseName << " ";
+				wcout << pHeadCourse->data.teacherName << " ";
+				_SText();
+				cout << pCurScore->data.total << " ";
+				cout << pCurScore->data.final << " ";
+				cout << pCurScore->data.mid << " ";
+				cout << pCurScore->data.other << " ";
+				cout << pCurScore->data.gpa << endl;
+			}
+			
+			pCurScore = pCurScore->pNext;
+		}
+		pHeadCourse = pHeadCourse->pNext;
 	}
+	
 }
 
 bool checkLoginStudent(string path, unsigned long long ID, string password, string& className) {
@@ -230,11 +243,7 @@ void changePassword(unsigned long long ID, string className) {
 	return;
 }
 
-//code lai tu dau
-//file sinh vien, info dong dau, nhung dong ke tiep thi moi dong 1 khoa cung voi diem cua khoa do, chua co thi mac dinh la 0
-
-//note: build lai struct score		 DONE
-
+//-------------
 int countEnrolledCourse(student stu) {
 	int result = 0;
 	_score* pCur = stu.score;
@@ -242,6 +251,22 @@ int countEnrolledCourse(student stu) {
 		result++;
 		pCur = pCur->pNext;
 	}
+	return result;
+}
+
+int countEnrolledCourseInSem(student stu, _course* pHead, Date curTime) {
+	int result = 0;
+	_score* pCur = nullptr;	
+
+	while (pHead != nullptr && pHead->pNext != nullptr) {
+		pCur = stu.score;
+		while (pCur != nullptr && pCur->pNext != nullptr) {
+			if (pCur->data.course_ID == pHead->data.courseId && curTime >= pHead->data.startRegis && curTime <= pHead->data.endRegis) result++;
+			pCur = pCur->pNext;
+		}
+		pHead = pHead->pNext;
+	}
+
 	return result;
 }
 
@@ -405,7 +430,8 @@ bool checkConflictCourse(student stu, course course) {
 	return 1;
 }
 
-void createTimetable(student& stu, _course* pHeadCourse) {
+//-------------
+void createTimetable(student& stu, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	stu.timeTable = new int* [4];
 	for (int i = 0; i < 4; i++) stu.timeTable[i] = new int[7];
 
@@ -420,7 +446,7 @@ void createTimetable(student& stu, _course* pHeadCourse) {
 	_course* pCurCourse = pHeadCourse;
 	while (pCur != nullptr) {
 		while (pCurCourse != nullptr) {
-			if (pCur->data.course_ID == pCurCourse->data.courseId) {
+			if (pCur->data.course_ID == pCurCourse->data.courseId && curTime >= pCurCourse->data.startRegis && curTime <= pCurCourse->data.endRegis) {
 				for (int i = 0; i < 2; i++) {
 					if (pCurCourse->data.session[i].dayOfWeek == L"MON") x = 0;
 					else if (pCurCourse->data.session[i].dayOfWeek == L"TUE") x = 1;
@@ -485,12 +511,13 @@ _score* takeTailEnrollCourse(student stu) {
 	return pCur;
 }
 
-void enrollCourse(student& stu, string className, _course* pHeadCourse) {
+//-------------
+void enrollCourse(student& stu, string className, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	cout << "Course's information list: " << endl;
 	displayCourseConsole(pHeadCourse);
 
 	//
-	if (countEnrolledCourse(stu) == 5) {
+	if (countEnrolledCourseInSem(stu, pHeadCourse, curTime) == 5) {
 		cout << "Full slot of enrolled course.\n";
 		return;
 	}
@@ -508,7 +535,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 			
 			readAllIndividualCourseFile(FolderPath, pHeadCourse);
 			stu = findInfoStudent(stu.Student_ID, className);
-			createTimetable(stu, pHeadCourse);
+			createTimetable(stu, pHeadCourse, curTime);
 		}
 		else cout << "Invalid choice\n";
 		cout << "Enter '0' to escape: ";
@@ -516,7 +543,8 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse) {
 	}
 }
 
-void viewEnrollCourse(student stu, _course* pHeadCourse) {
+//-------------
+void viewEnrollCourse(student stu, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	cout << "Total course: " << countEnrolledCourse(stu) << endl;
 	cout << "Enrolled course: " << endl;
 
@@ -525,7 +553,7 @@ void viewEnrollCourse(student stu, _course* pHeadCourse) {
 
 	while (pHeadCourse != nullptr && pHeadCourse->pNext != nullptr) {
 		while (pCur != nullptr) {
-			if (pCur->data.course_ID == pHeadCourse->data.courseId) displayIndividualCourseConsole(pHeadCourse->data);
+			if (pCur->data.course_ID == pHeadCourse->data.courseId && curTime >= pHeadCourse->data.startRegis && curTime <= pHeadCourse->data.endRegis) displayIndividualCourseConsole(pHeadCourse->data);
 			pCur = pCur->pNext;
 		}
 		pCur = stu.score;
@@ -534,8 +562,9 @@ void viewEnrollCourse(student stu, _course* pHeadCourse) {
 
 }
 
-void removeEnrollCourse(student& stu, string className, _course* pHeadCourse) {
-	viewEnrollCourse(stu, pHeadCourse);
+//-------------
+void removeEnrollCourse(student& stu, string className, _course* pHeadCourse, Date curTime = getSystemDate()) {
+	viewEnrollCourse(stu, pHeadCourse, curTime);
 	int temp, tempID;
 	_course* pCur = nullptr;
 	cout << "Enter 0 to skip remove course section: ";
@@ -545,21 +574,23 @@ void removeEnrollCourse(student& stu, string className, _course* pHeadCourse) {
 		cin >> tempID;
 		pCur = pHeadCourse;
 		while (pCur != nullptr && pCur->data.courseId != tempID) { pCur = pCur->pNext; }
-		if (pCur != nullptr) {
+		if (pCur != nullptr && curTime >= pCur->data.startRegis && curTime <= pCur->data.endRegis) {
 			writeIndividualCourseFileWithout1Student("Data\\Course\\" + to_string(pCur->data.courseId) + ".csv", pCur->data, stu.Student_ID);
 			createStudentFileWithout1Course(stu, className, tempID);
 			deleteTimeTable(stu);
 
 			readAllIndividualCourseFile("Data\\Course\\", pHeadCourse);
 			stu = findInfoStudent(stu.Student_ID, className);
-			createTimetable(stu, pHeadCourse);
+			createTimetable(stu, pHeadCourse, curTime);
 		}
+		else cout << "Can't find\n";
 
 		cout << "Enter 0 to escape: ";
 		cin >> temp;
 	}
 }
 
+//-------------
 void menuManageCourseStudent(student stu, string className) {
 	int flag = -1;
 	//load toan bo course hien co
@@ -567,9 +598,9 @@ void menuManageCourseStudent(student stu, string className) {
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 	readCourseFile(FolderPath + coursePath, pHeadCourse);
 	readAllIndividualCourseFile(FolderPath, pHeadCourse);
-
+	Date curTime;
 	//create time table -> chuyen sang phan enroll va remove course
-	createTimetable(stu, pHeadCourse);
+	createTimetable(stu, pHeadCourse, curTime);
 
 	while (flag != 0) {
 		system("CLS");
@@ -578,19 +609,22 @@ void menuManageCourseStudent(student stu, string className) {
 
 		switch (flag) {
 		case 1:
-			enrollCourse(stu, className, pHeadCourse);
+			enrollCourse(stu, className, pHeadCourse, curTime);
 			system("PAUSE");
 			break;
 		case 2:
-			viewEnrollCourse(stu, pHeadCourse);
+			viewEnrollCourse(stu, pHeadCourse, curTime);
 			system("PAUSE");
 			break;
 		case 3:
-			removeEnrollCourse(stu, className, pHeadCourse);
+			removeEnrollCourse(stu, className, pHeadCourse, curTime);
 			system("PAUSE");
 			break;
-		case 4:
-			printScoreboard(stu);
+		case 4: {
+			Date start, end;
+			create_chooseSem(start, end);
+			printScoreboardInSem(stu, pHeadCourse, start, end); 
+		}
 			system("PAUSE");
 			break;
 		case 0:

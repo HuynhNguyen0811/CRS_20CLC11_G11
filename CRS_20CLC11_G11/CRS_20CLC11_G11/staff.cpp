@@ -40,6 +40,44 @@ void deleteListStudentAttend(_studentRegis* &pHead) {
 	}
 }
 
+//return start end regis
+void create_chooseSem(Date &start, Date& end) {
+	//choose school year
+	int year;
+	cout << "Choose/Create school year: ";
+	cin >> year;
+
+	//choose sem
+	//chon 1 trong 3
+	int sem;
+	do {
+		cout << "Choose semester: ";
+		cin >> sem;
+	} while (sem != 1 && sem != 2 && sem != 3);
+	switch (sem) {
+	case 1: //ngay 1 thang 9 nam year den ngay 15 thang 12 nam year
+		start = { 16, 8, year };
+		end = { 1, 9, year };
+		break;
+	case 2: //ngay 1 thang 1 nam year + 1 den 15 thang 4 nam year + 1
+		start = { 16, 12, year };
+		end = { 1, 1, year + 1 };
+		break;
+	case 3: //ngay 1 thang 5 nam year + 1 den 15 thang 8 nam year + 1
+		start = { 16, 5, year + 1 };
+		end = { 1, 6, year + 1 };
+		break;
+	}
+}
+
+void applyStartEndRegis(_course* pHead, Date start, Date end) {
+	while (pHead != nullptr && pHead->pNext != nullptr) {
+		pHead->data.startRegis = start;
+		pHead->data.endRegis = end;
+		pHead = pHead->pNext;
+	}
+}
+
 void readFileStudent(string& path, _student*& pHead) {
 	wifstream fileIn;
 	do {
@@ -304,7 +342,9 @@ void displayClassAndStudent() {
 	}
 }
 
-void inputFromKeyboardCourse(_course*& pHead) {
+//-----------------------------------------------------------------------
+
+void inputFromKeyboardCourseInSem(_course*& pHead, Date start, Date end) {
 	_course* pCur = nullptr;
 	int temp = -1, check;
 	wchar_t a = '\n';
@@ -348,10 +388,9 @@ void inputFromKeyboardCourse(_course*& pHead) {
 			cout << "The session " << i + 1 << " of the course will performed (S1 (07:30), S2 (09:30), S3(13:30) and S4 (15:30)): ";
 			wcin >> pCur->data.session[i].hour;
 		}
-		//string temp;
-		//cout << "Start registration date: "; cin >> temp; pCur->data.startRegis = stringToDate(temp);
-		//cout << "End registration date: "; cin >> temp; pCur->data.endRegis = stringToDate(temp);
-		
+		pCur->data.startRegis = start;
+		pCur->data.endRegis = end;
+
 		pCur->pNext = nullptr;
 
 		cout << "Enter 0 to stop: ";
@@ -368,11 +407,6 @@ void readCourseFile(string path, _course*& pHead) {
 	wifstream fileIn;
 	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-	/*fileIn.ignore(1000, wchar_t(0xfeff));
-
-	fileIn.seekg(0, ios_base::end);
-	int end = fileIn.tellg();
-	fileIn.seekg(0, ios_base::beg);*/
 
 	if (fileIn.fail())
 	{
@@ -413,6 +447,117 @@ void readCourseFile(string path, _course*& pHead) {
 		pCur->data.startRegis = wstringToDate(temp);
 		getline(fileIn, temp, b);
 		pCur->data.endRegis = wstringToDate(temp);
+
+		pCur->pNext = nullptr;
+	}
+	fileIn.close();
+}
+
+void readCourseFileInSem(string path, _course*& pHead, Date start, Date end) {
+	wifstream fileIn;
+	fileIn.open(path, ios_base::in);
+	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	if (fileIn.fail())
+	{
+		cout << "File is not existed " << endl;
+		return;
+	}
+
+	_course* pCur = nullptr;
+	wstring tempID, tempCourseName, tempTeacherName, tempCredit, tempMaxStu;
+	wstring tempSD1, tempSD2, tempSH1, tempSH2;
+	wstring tempDate1, tempDate2;
+	wchar_t a = ',', b = '\n';
+	while (fileIn) {
+		if (pHead == nullptr) {
+			pHead = new _course;
+			pCur = pHead;
+		}
+		else {
+			pCur->pNext = new _course;
+			pCur = pCur->pNext;
+		}
+
+		getline(fileIn, tempID, a);
+		getline(fileIn, tempCourseName, a);
+		getline(fileIn, tempTeacherName, a);
+		getline(fileIn, tempCredit, a);
+		getline(fileIn, tempMaxStu, a);
+
+		getline(fileIn, pCur->data.session[0].dayOfWeek, a);
+		getline(fileIn, pCur->data.session[0].hour, a);
+
+		getline(fileIn, pCur->data.session[1].dayOfWeek, a);
+		getline(fileIn, pCur->data.session[1].hour, a);
+
+		getline(fileIn, tempDate1, a);
+		getline(fileIn, tempDate2, b);
+		
+		if (wstringToDate(tempDate1) == start) {
+			pCur->data.courseId = wstringToLong(tempID);
+			pCur->data.courseName = tempCourseName;
+			pCur->data.teacherName = tempTeacherName;
+			pCur->data.credit = wstringToInt(tempCredit);
+			pCur->data.maxStu = wstringToInt(tempMaxStu);
+
+			pCur->data.session = new session[2];
+			pCur->data.session[0].dayOfWeek = tempSD1;
+			pCur->data.session[0].hour = tempSH1;
+			pCur->data.session[1].dayOfWeek = tempSD2;
+			pCur->data.session[1].hour = tempSH2;
+
+			pCur->data.startRegis = wstringToDate(tempDate1);
+			pCur->data.endRegis = wstringToDate(tempDate2);
+		}
+
+		pCur->pNext = nullptr;
+	}
+	fileIn.close();
+}
+
+void readForInputCourseFileInSem(string path, _course*& pHead, Date start, Date end) {
+	wifstream fileIn;
+	fileIn.open(path, ios_base::in);
+	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	if (fileIn.fail())
+	{
+		cout << "File is not existed " << endl;
+		return;
+	}
+
+	_course* pCur = nullptr;
+	wstring temp;
+	wchar_t a = ',', b = '\n';
+	while (fileIn) {
+		if (pHead == nullptr) {
+			pHead = new _course;
+			pCur = pHead;
+		}
+		else {
+			pCur->pNext = new _course;
+			pCur = pCur->pNext;
+		}
+		getline(fileIn, temp, a);
+		pCur->data.courseId = wstringToLong(temp);
+		getline(fileIn, pCur->data.courseName, a);
+		getline(fileIn, pCur->data.teacherName, a);
+		getline(fileIn, temp, a);
+		pCur->data.credit = wstringToInt(temp);
+		getline(fileIn, temp, a);
+		pCur->data.maxStu = wstringToInt(temp);
+
+		pCur->data.session = new session[2];
+
+		getline(fileIn, pCur->data.session[0].dayOfWeek, a);
+		getline(fileIn, pCur->data.session[0].hour, a);
+
+		getline(fileIn, pCur->data.session[1].dayOfWeek, a);
+		getline(fileIn, pCur->data.session[1].hour, b);
+
+		pCur->data.startRegis = start;
+		pCur->data.endRegis = end;
 
 		pCur->pNext = nullptr;
 	}
@@ -508,6 +653,24 @@ void writeCourseFile(string path, _course* pHead) {
 	fileOut.close();
 }
 
+void addCourseFile(string path, _course* pHead) {
+	if (pHead == nullptr) return;
+	wofstream fileOut;
+	fileOut.open(path, ios_base::app);
+	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
+
+	while (pHead->pNext != nullptr) {
+		fileOut << pHead->data.courseId << "," << pHead->data.courseName << "," << pHead->data.teacherName << "," << pHead->data.credit << "," << pHead->data.maxStu << ",";
+		fileOut << pHead->data.session[0].dayOfWeek << "," << pHead->data.session[0].hour << ",";
+		fileOut << pHead->data.session[1].dayOfWeek << "," << pHead->data.session[1].hour << ",";
+		fileOut << pHead->data.startRegis.day << L"/" << pHead->data.startRegis.month << L"/" << pHead->data.startRegis.year << ",";
+		fileOut << pHead->data.endRegis.day << L"/" << pHead->data.endRegis.month << L"/" << pHead->data.endRegis.year << endl;
+		pHead = pHead->pNext;
+	}
+
+	fileOut.close();
+}
+
 void writeCourseFileWithout1Course(string path, _course* pHead, unsigned long long tempID) {
 	if (pHead == nullptr) return;
 	wofstream fileOut;
@@ -570,16 +733,6 @@ void writeIndividualCourseFileWithout1Student(string path, course pHead, unsigne
 	fileOut.close();
 }
 
-void addCourseListFile(string path, course pHead) { //khong su dung
-	wofstream fileOut;
-	fileOut.open(path, ios_base::app);
-	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-
-	fileOut << pHead.courseId << endl;
-
-	fileOut.close();
-}
-
 void addIndividualCourseFile(string path, course pHead) {
 	wofstream fileOut;
 	fileOut.open(path, ios_base::app);
@@ -594,7 +747,7 @@ void addIndividualCourseFile(string path, course pHead) {
 	fileOut.close();
 }
 
-void writeAllIndividualCourseFile(string path, _course* pHead) {
+void writeAllIndividualCourseFile(_course* pHead) {
 	string FolderPath = "Data\\Course\\", fileFormat = ".csv";
 
 	while (pHead->pNext != nullptr) {
@@ -615,8 +768,30 @@ void displayCourseConsole(_course* pHead) {
 		wcout << pHead->data.maxStu << " ";
 		wcout << pHead->data.session[0].dayOfWeek << "-" << pHead->data.session[0].hour << " ";
 		wcout << pHead->data.session[1].dayOfWeek << "-" << pHead->data.session[1].hour << " ";
-		wcout << pHead->data.startRegis.day << L"/" << pHead->data.startRegis.month << L"/" << pHead->data.startRegis.year << " ";
-		wcout << pHead->data.endRegis.day << L"/" << pHead->data.endRegis.month << L"/" << pHead->data.endRegis.year << endl;
+		wcout << endl;
+		/*wcout << pHead->data.startRegis.day << L"/" << pHead->data.startRegis.month << L"/" << pHead->data.startRegis.year << " ";
+		wcout << pHead->data.endRegis.day << L"/" << pHead->data.endRegis.month << L"/" << pHead->data.endRegis.year << endl;*/
+		pHead = pHead->pNext;
+	}
+
+	_SText();
+}
+
+void displayCourseConsoleInSem(_course* pHead, Date start, Date end) {
+	_LText();
+
+	while (pHead->pNext != nullptr) {
+		if (pHead->data.startRegis != start) continue;
+		wcout << pHead->data.courseId << " ";
+		wcout << pHead->data.courseName << " ";
+		wcout << pHead->data.teacherName << " ";
+		wcout << pHead->data.credit << " ";
+		wcout << pHead->data.maxStu << " ";
+		wcout << pHead->data.session[0].dayOfWeek << "-" << pHead->data.session[0].hour << " ";
+		wcout << pHead->data.session[1].dayOfWeek << "-" << pHead->data.session[1].hour << " ";
+		wcout << endl;
+		/*wcout << pHead->data.startRegis.day << L"/" << pHead->data.startRegis.month << L"/" << pHead->data.startRegis.year << " ";
+		wcout << pHead->data.endRegis.day << L"/" << pHead->data.endRegis.month << L"/" << pHead->data.endRegis.year << endl;*/
 		pHead = pHead->pNext;
 	}
 
@@ -634,9 +809,10 @@ void displayIndividualCourseConsole(course pHead) {
 	wcout << pHead.session[0].dayOfWeek << "-" << pHead.session[0].hour;
 	wcout << " ";
 	wcout << pHead.session[1].dayOfWeek << "-" << pHead.session[1].hour;
-	wcout << " ";
+	wcout << endl;
+	/*wcout << " ";
 	wcout << pHead.startRegis.day << L"/" << pHead.startRegis.month << L"/" << pHead.startRegis.year << " ";
-	wcout << pHead.endRegis.day << L"/" << pHead.endRegis.month << L"/" << pHead.endRegis.year << endl;
+	wcout << pHead.endRegis.day << L"/" << pHead.endRegis.month << L"/" << pHead.endRegis.year << endl;*/
 
 	_SText();
 
@@ -656,27 +832,36 @@ _course* findCourse(unsigned long long ID, _course* pHead) {
 		if (pHead->data.courseId == ID) return pHead;
 		pHead = pHead->pNext;
 	}
+	return nullptr;
 }
 
-void createCourseFromKeyboard() {
+_course* findCourseInSem(unsigned long long ID, _course* pHead, Date start, Date end) {
+	while (pHead != nullptr) {
+		if (pHead->data.courseId == ID && start == pHead->data.startRegis) return pHead;
+		pHead = pHead->pNext;
+	}
+	return nullptr;
+}
+
+void createCourseFromKeyboardInSem(Date start, Date end) {
 	_course* pHead = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 
 	_mkdir("Data");
 	_mkdir("Data\\Course");
 
-	inputFromKeyboardCourse(pHead);
+	inputFromKeyboardCourseInSem(pHead, start, end);
 
 	//displayCourseConsole(pHead);
 
-	writeCourseFile(FolderPath + coursePath, pHead);
+	addCourseFile(FolderPath + coursePath, pHead);
 
-	writeAllIndividualCourseFile("", pHead);
+	writeAllIndividualCourseFile(pHead);
 
 	deleteListCourse(pHead);
 }
 
-void createCourseFromFile() {
+void createCourseFromFileInSem(Date start, Date end) {
 	_course* pHead = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 
@@ -690,33 +875,37 @@ void createCourseFromFile() {
 	path += fileFormat;
 	cout << path << endl;
 
-	readCourseFile(path, pHead);
+	readForInputCourseFileInSem(path, pHead, start, end);
 
 	//displayCourseConsole(pHead);
 
-	writeCourseFile(FolderPath + coursePath, pHead);
+	addCourseFile(FolderPath + coursePath, pHead);
 
-	writeAllIndividualCourseFile("", pHead);
+	writeAllIndividualCourseFile(pHead);
 
 	deleteListCourse(pHead);
 }
 
-void editCourse() {
-	_course* pHead = nullptr, *pEdit;
+void editCourseInSem(Date start, Date end) {
+	_course* pHead = nullptr, * pEdit;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 
 	readCourseFile(FolderPath + coursePath, pHead);
 	readAllIndividualCourseFile(FolderPath, pHead);
 
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHead);
+	displayCourseConsoleInSem(pHead, start, end); 
 
 	unsigned long long tempID;
 	cout << "Enter the ID of the course you want to edit: ";
 	cin >> tempID;
 
-	pEdit = findCourse(tempID, pHead);
-
+	pEdit = findCourseInSem(tempID, pHead, start, end); 
+	if (pEdit == nullptr) {
+		cout << "Can't find!\n";
+		deleteListCourse(pHead);
+		return;
+	}
 	cout << "Course's information before edit:" << endl;
 	displayIndividualCourseConsole(pEdit->data);
 
@@ -753,24 +942,31 @@ void editCourse() {
 
 	writeCourseFile(FolderPath + coursePath, pHead);
 
-	writeAllIndividualCourseFile("", pHead);
+	writeAllIndividualCourseFile(pHead);
 
 	deleteListCourse(pHead);
 }
 
-void removeCourse() {
-	_course* pHead = nullptr, * pEdit;
+void removeCourseInSem(Date start, Date end) {
+	_course* pHead = nullptr, * pRemove;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 
 	readCourseFile(FolderPath + coursePath, pHead);
 	readAllIndividualCourseFile(FolderPath, pHead);
 
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHead);
+	displayCourseConsoleInSem(pHead, start, end);
 
 	unsigned long long tempID;
 	cout << "Enter the ID of the course you want to remove: ";
 	cin >> tempID;
+	//------------- check
+	pRemove = findCourseInSem(tempID, pHead, start, end);
+	if (pRemove == nullptr) {
+		cout << "Can't find!\n";
+		deleteListCourse(pHead);
+		return;
+	}
 
 	writeCourseFileWithout1Course(FolderPath + coursePath, pHead, tempID);
 	string path;
@@ -781,7 +977,7 @@ void removeCourse() {
 }
 
 //chua chia ham
-void viewAttendStudent() {
+void viewAttendStudentInSem(Date start, Date end) {
 	_course* pHead = nullptr, * pEdit;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 
@@ -792,10 +988,10 @@ void viewAttendStudent() {
 	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
 
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHead);
+	displayCourseConsoleInSem(pHead, start, end); //-------------
 
 	unsigned long long tempID;
-	_student* pHeadStu = nullptr, *pCreateStu = nullptr, *pDisplayStu = nullptr;
+	_student* pHeadStu = nullptr, * pCreateStu = nullptr, * pDisplayStu = nullptr;
 	_studentRegis* pCurStu;
 	_account* pCurAccount;
 	_course* pDisplay;
@@ -809,8 +1005,12 @@ void viewAttendStudent() {
 	while (temp != 0) {
 		cout << "Enter the ID of the course you want to view student list: ";
 		cin >> tempID;
-		pDisplay = findCourse(tempID, pHead); //have list of attend student's ID
-
+		//-------------
+		pDisplay = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID //-------------
+		if (pDisplay == nullptr) {
+			cout << "Can't find!\n";
+			continue;
+		}
 		pCurStu = pDisplay->data.studentID;
 		pCurAccount = pHeadAccount;
 		while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
@@ -822,7 +1022,7 @@ void viewAttendStudent() {
 					fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 					/*cout << "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv" << endl;
 					cout << path << endl;*/
-					
+
 					if (pHeadStu == nullptr) {
 						pHeadStu = new _student;
 						pCreateStu = pHeadStu;
@@ -869,8 +1069,8 @@ void viewAttendStudent() {
 }
 
 //chua chia ham
-void writeAttendStudent() {
-	_course* pHead = nullptr, * pEdit;
+void writeAttendStudentInSem(Date start, Date end) {
+	_course* pHead = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 
 	readCourseFile(FolderPath + coursePath, pHead);
@@ -880,7 +1080,7 @@ void writeAttendStudent() {
 	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
 
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHead);
+	displayCourseConsoleInSem(pHead, start, end); //-------------
 
 	unsigned long long tempID;
 	_student* pHeadStu = nullptr, * pCreateStu = nullptr, * pDisplayStu = nullptr;
@@ -898,8 +1098,9 @@ void writeAttendStudent() {
 	while (temp != 0) {
 		cout << "Enter the ID of the course you want to view student list: ";
 		cin >> tempID;
-		pDisplay = findCourse(tempID, pHead); //have list of attend student's ID
-
+		//-------------
+		pDisplay = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID //-------------
+		if (pDisplay == nullptr) continue;
 		pCurStu = pDisplay->data.studentID;
 		pCurAccount = pHeadAccount;
 		while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
@@ -909,9 +1110,7 @@ void writeAttendStudent() {
 					path = "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv";
 					fileIn.open(path, ios_base::in);
 					fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-					/*cout << "Data\\Classes\\" + pCurAccount->data.className + "\\" + to_string(pCurAccount->data.Student_ID) + ".csv" << endl;
-					cout << path << endl;*/
-					if (!fileIn) cout << "toang" << endl;
+					//if (!fileIn) cout << "toang" << endl;
 					if (pHeadStu == nullptr) {
 						pHeadStu = new _student;
 						pCreateStu = pHeadStu;
@@ -940,7 +1139,7 @@ void writeAttendStudent() {
 		}
 		cout << "Name of file you want to export: ";
 		cin >> path;
-		
+
 		fileOut.open(path, ios_base::out);
 		fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
@@ -963,6 +1162,9 @@ void writeAttendStudent() {
 	//thieu delete studentRegis
 	deleteListCourse(pHead);
 }
+
+
+//-----------------------------------------------------------------------
 
 //coi nhu nguoi dung input du cot diem cua toan bo sv
 void readScoreboard(string path, _course*& course) {
@@ -999,16 +1201,6 @@ void readScoreboard(string path, _course*& course) {
 		fileIn >> pCur->mid >> a;
 		fileIn >> pCur->other >> a;
 		fileIn >> pCur->gpa;
-		/*_LText();
-		wcout << pCur->no << " ";
-		wcout << pCur->data << " ";
-		wcout << pCur->name << " ";
-		wcout << pCur->total << " ";
-		wcout << pCur->final << " ";
-		wcout << pCur->mid << " ";
-		wcout << pCur->other << " ";
-		wcout << pCur->gpa << endl;
-		_SText();*/
 		pCur->pNext = nullptr;
 	}
 
@@ -1089,42 +1281,46 @@ void writeScoreboardAllIndividualStu(_course* course) {
 	}
 }
 
-void inputScoreboard() {
+void inputScoreboardInSem(Date start, Date end) {
 	//read course list
 	_course* pHead = nullptr, * pEdit;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv", path;
 
 	readCourseFile(FolderPath + coursePath, pHead);
 	readAllIndividualCourseFile(FolderPath, pHead);
-	
+
 	//display list of courses
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHead);
+	//-------------
+	displayCourseConsoleInSem(pHead, start, end);
 
 	//choose course
 	unsigned long long tempID;
 	cout << "Enter the ID of the course you want to import scoreboard: ";
 	cin >> tempID;
 	//find course
-	pEdit = findCourse(tempID, pHead);
-
+	pEdit = findCourseInSem(tempID, pHead, start, end);//-------------
+	if (pEdit == nullptr) {
+		cout << "Can't find!\n";
+		deleteListCourse(pHead);
+		return;
+	}
 	//input file name
 	cout << "Enter the name of file you want to import: ";
 	cin >> path;
 	//read
 	readScoreboard(path, pEdit);
-	/*cout << "---------------" << endl;
-	displayScoreboardConsole(pEdit);*/
+
 	//rewrite
 	path = FolderPath + to_string(pEdit->data.courseId) + fileFormat;
 	writeIndividualCourseFile(path, pEdit->data);
 	writeScoreboardAllIndividualStu(pEdit);
+
 	//delete
 	deleteListCourse(pHead);
 }
 
-//chua chia ham
-void viewScoreboardCourse() {
+void viewScoreboardCourseInSem(Date start, Date end) {
 	//read course list
 	_course* pHead = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv", path;
@@ -1137,7 +1333,7 @@ void viewScoreboardCourse() {
 
 	//display list of courses
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHead);
+	displayCourseConsoleInSem(pHead, start, end);//-------------
 
 	//choose course
 	unsigned long long tempID;
@@ -1154,8 +1350,11 @@ void viewScoreboardCourse() {
 	while (temp != 0) {
 		cout << "Enter the ID of the course you want to view scoreboard: ";
 		cin >> tempID;
-		pDisplay = findCourse(tempID, pHead); //have list of attend student's ID
-
+		pDisplay = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID
+		if (pDisplay == nullptr) {
+			cout << "Can't find\n";
+			continue;
+		}
 		pCurStu = pDisplay->data.studentID;
 		pCurAccount = pHeadAccount;
 		while (pCurStu != nullptr && pCurStu->pNext != nullptr) {
@@ -1178,14 +1377,14 @@ void viewScoreboardCourse() {
 				pCurAccount = pCurAccount->pNext;
 			}
 			//cout << "\n\t1" << pCurStu->data;
-			
+
 			pCurStu = pCurStu->pNext;
 			pCurAccount = pHeadAccount;
 		}
 
 		cout << "Scoreboard: \n";
 		displayScoreboardConsole(pDisplay);
-		
+
 		cout << "Enter 0 to escape: ";
 		cin >> temp;
 	}
@@ -1194,7 +1393,7 @@ void viewScoreboardCourse() {
 	deleteListCourse(pHead);
 }
 
-void viewScoreboardClass() {
+void viewScoreboardClassInSem(Date start, Date end) {
 
 	//load class and full course
 	string folderPath = "Data\\", fileFormat = ".csv", path;
@@ -1205,9 +1404,9 @@ void viewScoreboardClass() {
 	path = folderPath + classPath + classListPath;
 	readClassName(path, pHeadClass);
 
-	_course* pHeadCourse = nullptr, *pCurCourse = nullptr;
+	_course* pHeadCourse = nullptr, * pCurCourse = nullptr;
 	path = folderPath + coursePath + courseListPath;
-	readCourseFile(path, pHeadCourse);
+	readCourseFileInSem(path, pHeadCourse, start, end);//-------------
 
 	_score* pCurScore = nullptr;
 
@@ -1263,7 +1462,7 @@ void viewScoreboardClass() {
 		fileIn.close();
 	}
 	//got the data we need
-	
+
 	cout << dem;
 	system("CLS");
 	resizeConsole(1200, 600);
@@ -1322,9 +1521,10 @@ void viewScoreboardClass() {
 		pCurStu = pCurStu->pNext;
 	}
 	//a lot of delete
+
 }
 
-void editScoreFromCourse() {
+void editScoreFromCourseInSem(Date start, Date end) {
 	//read course list
 	_course* pHead = nullptr;
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv", path;
@@ -1337,7 +1537,7 @@ void editScoreFromCourse() {
 
 	//display list of courses
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHead);
+	displayCourseConsoleInSem(pHead, start, end);//-------------
 
 	//choose course
 	unsigned long long tempID, tempStuID;
@@ -1352,7 +1552,8 @@ void editScoreFromCourse() {
 
 	cout << "Enter the ID of the course you want to edit scoreboard: ";
 	cin >> tempID;
-	pEdit = findCourse(tempID, pHead); //have list of attend student's ID
+	
+	pEdit = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID 
 	cout << "Enter the ID of the student you want to edit: ";
 	cin >> tempStuID;
 
@@ -1412,8 +1613,6 @@ void editScoreFromCourse() {
 
 void menuManageStudent() {
 
-	//choose school year
-
 	int temp = 1;
 	while (temp != '0') {
 		system("CLS");
@@ -1421,8 +1620,10 @@ void menuManageStudent() {
 		temp = _getch();
 		switch (temp) {
 		case '1':
+			inputClass();
 			break;
 		case '2':
+			displayClassAndStudent();
 			break;
 		default:
 			break;
@@ -1434,9 +1635,8 @@ void menuManageStudent() {
 }
 
 void menuManageCourse() {
-
-	//choose school year
-	//choose sem
+	Date start, end;
+	create_chooseSem(start, end);
 
 	int temp = 1;
 	while (temp != '0') {
@@ -1452,10 +1652,10 @@ void menuManageCourse() {
 			tempSub = _getch();
 			switch (tempSub) {
 			case '1':
-				createCourseFromKeyboard();
+				createCourseFromKeyboardInSem(start, end);
 				break;
 			case '2':
-				createCourseFromFile();
+				createCourseFromFileInSem(start, end);
 				break;
 			default:
 				break;
@@ -1467,14 +1667,14 @@ void menuManageCourse() {
 			string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 			readCourseFile(FolderPath + coursePath, pHead);
 			cout << "Course's information list: " << endl;
-			displayCourseConsole(pHead);
+			displayCourseConsoleInSem(pHead, start, end);
 			break;
 		}
 		case '3':
-			editCourse();
+			editCourseInSem(start, end);
 			break;
 		case '4':
-			removeCourse();
+			removeCourseInSem(start, end);
 			break;
 		default:
 			break;
@@ -1486,9 +1686,8 @@ void menuManageCourse() {
 }
 
 void menuManageScore() {
-
-	//choose school year
-	//choose sem
+	Date start, end;
+	create_chooseSem(start, end);
 
 	int temp = 1;
 	while (temp != '0') {
@@ -1497,7 +1696,7 @@ void menuManageScore() {
 		temp = _getch();
 		switch (temp) {
 		case '1':
-			inputScoreboard();
+			inputScoreboardInSem(start, end);
 			break;
 		case '2': {
 			//choose method
@@ -1506,10 +1705,10 @@ void menuManageScore() {
 			tempSub = _getch();
 			switch (tempSub) {
 			case '1':
-				viewScoreboardCourse();
+				viewScoreboardCourseInSem(start, end);
 				break;
 			case '2':
-				viewScoreboardClass();
+				viewScoreboardClassInSem(start, end);
 				break;
 			default:
 				break;
@@ -1517,6 +1716,7 @@ void menuManageScore() {
 			break; 
 		}
 		case '3':
+			editScoreFromCourseInSem(start, end);
 			break;
 		default:
 			break;
