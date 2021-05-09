@@ -2,31 +2,6 @@
 #include "staff.h"
 #include "commonFunc.h"
 
-//void menuStudent(unsigned long long& ID, string className) {
-//	system("CLS");
-//	int flag = -1;
-//	while (flag != 0) {
-//		cout << "\n1.Check your profile\n2.Manage course\n3.Change password\n4.Log out\n0.Escape";
-//		cin >> flag;
-//		switch (flag) {
-//		case 1:
-//			findAndPrintStudent(ID, className);
-//			break;
-//		case 2:
-//			break;
-//		case 3:
-//			changePassword(ID, className);
-//			break;
-//		case 4:
-//			ID = NULL;
-//			login(ID, className);
-//			break;
-//		default:
-//			break;
-//		}
-//	}
-//}
-
 void deleteListScore(student& stu) {
 	_score* pCur = stu.score;
 	while (pCur != nullptr) {
@@ -42,19 +17,19 @@ void deleteTimeTable(student& stu) {
 		delete[] stu.timeTable[i];
 	}
 	delete[] stu.timeTable;
+	stu.timeTable = nullptr;
 }
 
 void login() {
-	system("CLS");
 	int flag = 1, out;
-	long IDStudent = NULL;
+	unsigned long long IDStudent = NULL;
 	string temp, className;
 	string IDStaff;
 	string password = "";
 	bool check = 0;
 	string path;
 	string folderName = "Data\\";
-	string pathSub = "Classes\\", fileFormat = ".csv";
+	//string pathSub = "Classes\\", fileFormat = ".csv";
 
 	while (flag != 0) {
 		system("CLS");
@@ -73,7 +48,7 @@ void login() {
 				cin >> IDStudent;
 				cout << "Password: ";
 				cin >> password;
-				path = folderName + "passStudent" + fileFormat;
+				path = folderDir + passStudentDir;
 				check = checkLoginStudent(path, IDStudent, password, className);
 			}
 			check = 0;
@@ -88,11 +63,11 @@ void login() {
 					cin >> out;
 					if (out == 0) break;
 				}
-				cout << "ID: ";
+				cout << "Username: ";
 				cin >> IDStaff;
 				cout << "Password: ";
 				cin >> password;
-				path = folderName + "passStaff" + fileFormat;
+				path = folderName + "passStaff" + csvFormat;
 				check = checkLoginStaff(path, IDStaff, password);
 			}
 			check = 0;
@@ -532,9 +507,9 @@ void addEnrolledCourse(student stu, string className, unsigned long long course_
 }
 
 void addStudentToCourse(unsigned long long student_ID, unsigned long long course_ID) {
-	string FolderPath = "Data\\Course\\", fileFormat = ".csv";
+	string folderPath = "Data\\Course\\", fileFormat = ".csv";
 	wofstream fileOut;
-	fileOut.open(FolderPath + to_string(course_ID) + fileFormat, ios_base::app);
+	fileOut.open(folderPath + to_string(course_ID) + fileFormat, ios_base::app);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
 	fileOut << student_ID << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << ",,,,," << endl;
@@ -550,14 +525,13 @@ _score* takeTailEnrollCourse(student stu) {
 	return pCur;
 }
 
-//-------------
 void enrollCourse(student& stu, string className, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	Date start, end;
 	defineStartEndRegis(start, end, curTime);
 	cout << "Course's information list: " << endl;
 	displayCourseConsoleInSem(pHeadCourse, start, end);
 
-	//
+
 	if (countEnrolledCourseInSem(stu, pHeadCourse, curTime) == 5) {
 		cout << "Full slot of enrolled course.\n";
 		return;
@@ -565,7 +539,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 
 	int temp = -1;
 	unsigned long long tempID;
-	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+	string folderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 	while (temp != 0) {
 		cout << "Input the course's ID you want to enroll: ";
 		cin >> tempID;
@@ -574,7 +548,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 			addStudentToCourse(stu.Student_ID, tempID);
 			deleteTimeTable(stu);
 			
-			readAllIndividualCourseFile(FolderPath, pHeadCourse);
+			readAllIndividualCourseFile(folderPath, pHeadCourse);
 			stu = findInfoStudent(stu.Student_ID, className);
 			createTimetable(stu, pHeadCourse, curTime);
 		}
@@ -584,7 +558,6 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 	}
 }
 
-//-------------
 void viewEnrollCourse(student stu, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	cout << "Total course: " << countEnrolledCourseInSem(stu, pHeadCourse, curTime) << endl;
 	cout << "Enrolled course: " << endl;
@@ -603,7 +576,6 @@ void viewEnrollCourse(student stu, _course* pHeadCourse, Date curTime = getSyste
 
 }
 
-//-------------
 void removeEnrollCourse(student& stu, string className, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	viewEnrollCourse(stu, pHeadCourse, curTime);
 	int temp, tempID;
@@ -631,14 +603,13 @@ void removeEnrollCourse(student& stu, string className, _course* pHeadCourse, Da
 	}
 }
 
-//-------------
 void menuManageCourseStudent(student stu, string className) {
 	int flag = -1;
 	//load toan bo course hien co
 	_course* pHeadCourse = nullptr;
-	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
-	readCourseFile(FolderPath + coursePath, pHeadCourse);
-	readAllIndividualCourseFile(FolderPath, pHeadCourse);
+	string folderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
+	readCourseFile(folderPath + coursePath, pHeadCourse);
+	readAllIndividualCourseFile(folderPath, pHeadCourse);
 	Date curTime = getSystemDate();
 	//create time table -> chuyen sang phan enroll va remove course
 	createTimetable(stu, pHeadCourse, curTime);
@@ -681,12 +652,12 @@ void menuManageCourseStudent(student stu, string className) {
 			break;
 		case 0:
 			// thieu delete
-			
+			deleteTimeTable(stu);
+			deleteListCourse(pHeadCourse);
 			break;
 		default:
 			break;
 		}
-	
 	}
 }
 
@@ -718,19 +689,11 @@ void menuStudent(unsigned long long ID, string className) {
 			changePassword(ID, className);
 			system("PAUSE");
 			break;
+		case 0:
+			deleteListScore(stu);
+			break;
 		default: 
 			break;
 		}
 	}
-
-	//option 1: view info
-
-	//option 2: manage course
-	//view enroll course
-	//regis course
-	//delete course
-
-	//option 3: change pass
-
-	//option 4: logout 
 }

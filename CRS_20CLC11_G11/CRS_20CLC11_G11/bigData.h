@@ -21,6 +21,14 @@
 
 using namespace std;
 
-
+const string folderDir = "Data\\";
+const string folderClassDir = "Classes\\";
+const string folderCourseDir = "Course\\";
+const string classListDir = "Class_Name.csv";
+const string courseListDir = "Course.csv";
+const string passStaffDir = "passStaff.csv";
+const string passStudentDir = "passStudent.csv";
+const string csvFormat = ".csv";
+const string txtFormat = ".txt";
 
 #endif

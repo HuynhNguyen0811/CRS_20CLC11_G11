@@ -2,7 +2,6 @@
 #include "bigData.h"
 #include "staff.h"
 #include "student.h"
-#include "commonFunc.h"
 
 int main() {
 	_CrtSetReportMode(_CRT_WARN, _CRTDBG_MODE_FILE);
