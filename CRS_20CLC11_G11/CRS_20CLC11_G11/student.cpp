@@ -28,8 +28,6 @@ void login() {
 	string password = "";
 	bool check = 0;
 	string path;
-	string folderName = "Data\\";
-	string pathSub = "Classes\\", fileFormat = ".csv";
 
 	while (flag != 0) {
 		system("CLS");
@@ -67,7 +65,7 @@ void login() {
 				cin >> IDStaff;
 				cout << "Password: ";
 				cin >> password;
-				path = folderName + "passStaff" + csvFormat;
+				path = folderDir + "passStaff" + csvFormat;
 				check = checkLoginStaff(path, IDStaff, password);
 			}
 			check = 0;
@@ -84,9 +82,7 @@ void login() {
 //display
 void findAndPrintStudent(unsigned long long ID, string className) {
 	wifstream fileIn;
-	string folderName = "Data\\Classes\\";
-	string fileFormat = ".csv";
-	string path = folderName + className + fileFormat;
+	string path = folderDir + folderClassDir + className + csvFormat;
 	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
@@ -147,12 +143,12 @@ void printScoreboardInSem(student stu, _course* pHeadCourse, Date start, Date en
 				cout << pCurScore->data.other << " ";
 				cout << pCurScore->data.gpa << endl;
 			}
-			
+
 			pCurScore = pCurScore->pNext;
 		}
 		pHeadCourse = pHeadCourse->pNext;
 	}
-	
+
 }
 
 //login
@@ -214,7 +210,7 @@ void changePassword(unsigned long long ID, string className) {
 	string newPassword;
 	cout << "New password: ";
 	cin >> newPassword;
-	editFilePassword("Data\\Classes\\passStudent.csv", ID, className, newPassword);
+	editFilePassword(folderDir + passStudentDir, ID, className, newPassword);
 	cout << "Change successfully\n";
 	system("PAUSE");
 	return;
@@ -232,7 +228,7 @@ int countEnrolledCourse(student stu) {
 
 int countEnrolledCourseInSem(student stu, _course* pHead, Date curTime) {
 	int result = 0;
-	_score* pCur = nullptr;	
+	_score* pCur = nullptr;
 
 	while (pHead != nullptr && pHead->pNext != nullptr) {
 		pCur = stu.score;
@@ -248,23 +244,18 @@ int countEnrolledCourseInSem(student stu, _course* pHead, Date curTime) {
 
 //chua chia ham
 student findInfoStudent(unsigned long long ID, string className) {
-	string folderName = "Data\\Classes\\", fileFormat = ".csv";
 	wifstream fileIn;
-	
-	fileIn.open(folderName + className + "\\" + to_string(ID) + fileFormat, ios_base::in);
+
+	fileIn.open(folderDir + folderClassDir + className + "\\" + to_string(ID) + csvFormat, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 	fileIn.ignore(1000, wchar_t(0xfeff));
-
-	fileIn.seekg(0, ios_base::end);
-	int end = fileIn.tellg();
-	fileIn.seekg(0, ios_base::beg);
 
 	student stu;
 
 	if (fileIn.fail()) { //lan dau dang nhap, chua co san file rieng
 		stu = findStudent(ID, className);
 		return stu;
-	} 
+	}
 
 	//co san file rieng
 
@@ -284,7 +275,8 @@ student findInfoStudent(unsigned long long ID, string className) {
 		if (stu.score == nullptr) {
 			stu.score = new _score;
 			pCurScore = stu.score;
-		} else {
+		}
+		else {
 			pCurScore->pNext = new _score;
 			pCurScore = pCurScore->pNext;
 		}
@@ -306,10 +298,8 @@ student findInfoStudent(unsigned long long ID, string className) {
 
 student findStudent(unsigned long long ID, string className) {
 	wifstream fileIn;
-	string folderName = "Data\\Classes\\";
-	string fileFormat = ".csv";
 
-	string path = folderName + className + fileFormat;
+	string path = folderDir + folderClassDir + className + csvFormat;
 	fileIn.open(path, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
@@ -331,17 +321,15 @@ student findStudent(unsigned long long ID, string className) {
 		if (stu.Student_ID == ID) break;
 	}
 	fileIn.close();
-	return stu; 
+	return stu;
 }
 
 void createStudentFile(student stu, string className) {
-	
-	string folderName = "Data\\Classes\\", fileFormat = ".csv";
-	char* path = new char[(folderName + className).size() + 1];
-	stringToChar(path, folderName + className);
+	char* path = new char[(folderDir + folderClassDir + className).size() + 1];
+	stringToChar(path, folderDir + folderClassDir + className);
 	_mkdir(path);
 	wofstream fileOut;
-	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::out);
+	fileOut.open(folderDir + folderClassDir + className + "\\" + to_string(stu.Student_ID) + csvFormat, ios_base::out);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
 	fileOut << stu.Student_ID << L"," << stu.FirstName << L"," << stu.LastName << L"," << stu.Gender << L"," << stu.Date_Of_Birth.day << wchar_t(47) << stu.Date_Of_Birth.month << wchar_t(47) << stu.Date_Of_Birth.year << L"," << stu.Social_ID << endl;
@@ -357,12 +345,11 @@ void createStudentFile(student stu, string className) {
 
 void createStudentFileWithout1Course(student stu, string className, unsigned long long course_ID) {
 
-	string folderName = "Data\\Classes\\", fileFormat = ".csv";
-	char* path = new char[(folderName + className).size() + 1];
-	stringToChar(path, folderName + className);
+	char* path = new char[(folderDir + folderClassDir + className).size() + 1];
+	stringToChar(path, folderDir + folderClassDir + className);
 	_mkdir(path);
 	wofstream fileOut;
-	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::out);
+	fileOut.open(folderDir + folderClassDir + className + "\\" + to_string(stu.Student_ID) + csvFormat, ios_base::out);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
 	fileOut << stu.Student_ID << L"," << stu.FirstName << L"," << stu.LastName << L"," << stu.Gender << L"," << stu.Date_Of_Birth.day << wchar_t(47) << stu.Date_Of_Birth.month << wchar_t(47) << stu.Date_Of_Birth.year << L"," << stu.Social_ID << endl;
@@ -401,7 +388,7 @@ bool checkConflictCourse(student stu, course course) {
 		else if (course.session[i].hour == L"S3") y = 2;
 		else if (course.session[i].hour == L"S4") y = 3;
 		else y = 0;
-		if(stu.timeTable[y][x] == 1) return 0;
+		if (stu.timeTable[y][x] == 1) return 0;
 	}
 	return 1;
 }
@@ -459,7 +446,7 @@ bool checkRegisTime(Date curTime = getSystemDate()) {
 	return 0;
 }
 
-void defineStartEndRegis(Date &start, Date &end, Date curTime = getSystemDate()) {
+void defineStartEndRegis(Date& start, Date& end, Date curTime = getSystemDate()) {
 	Date down, up;
 	down = { 16, 8, curTime.year };
 	up = { 1, 9, curTime.year };
@@ -496,9 +483,9 @@ void displayTimetable(student stu) {
 }
 
 void addEnrolledCourse(student stu, string className, unsigned long long course_ID) {
-	string folderName = "Data\\Classes\\", fileFormat = ".csv";
+
 	wofstream fileOut;
-	fileOut.open(folderName + className + "\\" + to_string(stu.Student_ID) + fileFormat, ios_base::app);
+	fileOut.open(folderDir + folderClassDir + className + "\\" + to_string(stu.Student_ID) + csvFormat, ios_base::app);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
 	fileOut << course_ID << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << endl;
@@ -507,9 +494,8 @@ void addEnrolledCourse(student stu, string className, unsigned long long course_
 }
 
 void addStudentToCourse(unsigned long long student_ID, unsigned long long course_ID) {
-	string folderPath = "Data\\Course\\", fileFormat = ".csv";
 	wofstream fileOut;
-	fileOut.open(folderPath + to_string(course_ID) + fileFormat, ios_base::app);
+	fileOut.open(folderDir + folderCourseDir + to_string(course_ID) + csvFormat, ios_base::app);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 
 	fileOut << student_ID << "," << 0 << "," << 0 << "," << 0 << "," << 0 << "," << 0 << ",,,,," << endl;
@@ -539,7 +525,6 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 
 	int temp = -1;
 	unsigned long long tempID;
-	string folderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 	while (temp != 0) {
 		cout << "Input the course's ID you want to enroll: ";
 		cin >> tempID;
@@ -547,8 +532,8 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 			addEnrolledCourse(stu, className, tempID);
 			addStudentToCourse(stu.Student_ID, tempID);
 			deleteTimeTable(stu);
-			
-			readAllIndividualCourseFile(folderPath, pHeadCourse);
+
+			readAllIndividualCourseFile(folderDir + folderClassDir, pHeadCourse);
 			stu = findInfoStudent(stu.Student_ID, className);
 			createTimetable(stu, pHeadCourse, curTime);
 		}
@@ -559,7 +544,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 }
 
 void viewEnrollCourse(student stu, _course* pHeadCourse, Date curTime = getSystemDate()) {
-	cout << "Total course: " << countEnrolledCourseInSem(stu, pHeadCourse, curTime) << endl;
+	cout << "Total course in this sem: " << countEnrolledCourseInSem(stu, pHeadCourse, curTime) << endl;
 	cout << "Enrolled course: " << endl;
 
 	//_course* pDisplay = nullptr;
@@ -588,11 +573,11 @@ void removeEnrollCourse(student& stu, string className, _course* pHeadCourse, Da
 		pCur = pHeadCourse;
 		while (pCur != nullptr && pCur->data.courseId != tempID) { pCur = pCur->pNext; }
 		if (pCur != nullptr && curTime >= pCur->data.startRegis && curTime <= pCur->data.endRegis) {
-			writeIndividualCourseFileWithout1Student("Data\\Course\\" + to_string(pCur->data.courseId) + ".csv", pCur->data, stu.Student_ID);
+			writeIndividualCourseFileWithout1Student(folderDir + folderCourseDir + to_string(pCur->data.courseId) + csvFormat, pCur->data, stu.Student_ID);
 			createStudentFileWithout1Course(stu, className, tempID);
 			deleteTimeTable(stu);
 
-			readAllIndividualCourseFile("Data\\Course\\", pHeadCourse);
+			readAllIndividualCourseFile(folderDir + folderCourseDir, pHeadCourse);
 			stu = findInfoStudent(stu.Student_ID, className);
 			createTimetable(stu, pHeadCourse, curTime);
 		}
@@ -607,9 +592,8 @@ void menuManageCourseStudent(student stu, string className) {
 	int flag = -1;
 	//load toan bo course hien co
 	_course* pHeadCourse = nullptr;
-	string folderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
-	readCourseFile(folderPath + coursePath, pHeadCourse);
-	readAllIndividualCourseFile(folderPath, pHeadCourse);
+	readCourseFile(folderDir + folderCourseDir + courseListDir, pHeadCourse);
+	readAllIndividualCourseFile(folderDir + folderCourseDir, pHeadCourse);
 	Date curTime = getSystemDate();
 	//create time table -> chuyen sang phan enroll va remove course
 	createTimetable(stu, pHeadCourse, curTime);
@@ -627,7 +611,7 @@ void menuManageCourseStudent(student stu, string className) {
 			else {
 				cout << "Not in Registration time\n";
 			}
-			
+
 			system("PAUSE");
 			break;
 		case 2:
@@ -646,10 +630,10 @@ void menuManageCourseStudent(student stu, string className) {
 		case 4: {
 			Date start, end;
 			create_chooseSem(start, end);
-			printScoreboardInSem(stu, pHeadCourse, start, end); 
+			printScoreboardInSem(stu, pHeadCourse, start, end);
 		}
-			system("PAUSE");
-			break;
+			  system("PAUSE");
+			  break;
 		case 0:
 			// thieu delete
 			deleteTimeTable(stu);
@@ -685,14 +669,14 @@ void menuStudent(unsigned long long ID, string className) {
 			menuManageCourseStudent(stu, className);
 			system("PAUSE");
 			break;
-		case 3: 
+		case 3:
 			changePassword(ID, className);
 			system("PAUSE");
 			break;
 		case 0:
 			deleteListScore(stu);
 			break;
-		default: 
+		default:
 			break;
 		}
 	}
