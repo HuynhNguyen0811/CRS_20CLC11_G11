@@ -59,7 +59,7 @@ void deleteListAccount(_account*& pHead) {
 void create_chooseSem(Date &start, Date& end) {
 	//choose school year
 	int year;
-	cout << "Choose/Create school year: ";
+	cout << "Choose school year: ";
 	cin >> year;
 
 	//choose sem

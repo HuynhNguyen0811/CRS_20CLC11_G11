@@ -143,12 +143,12 @@ void printScoreboardInSem(student stu, _course* pHeadCourse, Date start, Date en
 				cout << pCurScore->data.other << " ";
 				cout << pCurScore->data.gpa << endl;
 			}
-
+			
 			pCurScore = pCurScore->pNext;
 		}
 		pHeadCourse = pHeadCourse->pNext;
 	}
-
+	
 }
 
 //login
@@ -228,7 +228,7 @@ int countEnrolledCourse(student stu) {
 
 int countEnrolledCourseInSem(student stu, _course* pHead, Date curTime) {
 	int result = 0;
-	_score* pCur = nullptr;
+	_score* pCur = nullptr;	
 
 	while (pHead != nullptr && pHead->pNext != nullptr) {
 		pCur = stu.score;
@@ -245,7 +245,7 @@ int countEnrolledCourseInSem(student stu, _course* pHead, Date curTime) {
 //chua chia ham
 student findInfoStudent(unsigned long long ID, string className) {
 	wifstream fileIn;
-
+	
 	fileIn.open(folderDir + folderClassDir + className + "\\" + to_string(ID) + csvFormat, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
 	fileIn.ignore(1000, wchar_t(0xfeff));
@@ -255,7 +255,7 @@ student findInfoStudent(unsigned long long ID, string className) {
 	if (fileIn.fail()) { //lan dau dang nhap, chua co san file rieng
 		stu = findStudent(ID, className);
 		return stu;
-	}
+	} 
 
 	//co san file rieng
 
@@ -275,8 +275,7 @@ student findInfoStudent(unsigned long long ID, string className) {
 		if (stu.score == nullptr) {
 			stu.score = new _score;
 			pCurScore = stu.score;
-		}
-		else {
+		} else {
 			pCurScore->pNext = new _score;
 			pCurScore = pCurScore->pNext;
 		}
@@ -321,13 +320,14 @@ student findStudent(unsigned long long ID, string className) {
 		if (stu.Student_ID == ID) break;
 	}
 	fileIn.close();
-	return stu;
+	return stu; 
 }
 
 void createStudentFile(student stu, string className) {
 	char* path = new char[(folderDir + folderClassDir + className).size() + 1];
 	stringToChar(path, folderDir + folderClassDir + className);
 	_mkdir(path);
+	delete[] path;
 	wofstream fileOut;
 	fileOut.open(folderDir + folderClassDir + className + "\\" + to_string(stu.Student_ID) + csvFormat, ios_base::out);
 	fileOut.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
@@ -388,7 +388,7 @@ bool checkConflictCourse(student stu, course course) {
 		else if (course.session[i].hour == L"S3") y = 2;
 		else if (course.session[i].hour == L"S4") y = 3;
 		else y = 0;
-		if (stu.timeTable[y][x] == 1) return 0;
+		if(stu.timeTable[y][x] == 1) return 0;
 	}
 	return 1;
 }
@@ -446,27 +446,27 @@ bool checkRegisTime(Date curTime = getSystemDate()) {
 	return 0;
 }
 
-void defineStartEndRegis(Date& start, Date& end, Date curTime = getSystemDate()) {
+void defineStartEndRegis(Date &start, Date &end, Date curTime = getSystemDate()) {
 	Date down, up;
 	down = { 16, 8, curTime.year };
 	up = { 1, 9, curTime.year };
 	if (curTime >= down && curTime <= up) {
 		start = down;
-		end = end;
+		end = up;
 		return;
 	}
 	down = { 16, 12, curTime.year };
 	up = { 1, 1, curTime.year + 1 };
 	if (curTime >= down && curTime <= up) {
 		start = down;
-		end = end;
+		end = up;
 		return;
 	}
 	down = { 16, 5, curTime.year };
-	up = { 1, 6, curTime.year };
+	up = { 1, 6, curTime.year  };
 	if (curTime >= down && curTime <= up) {
 		start = down;
-		end = end;
+		end = up;
 		return;
 	}
 }
@@ -514,25 +514,27 @@ _score* takeTailEnrollCourse(student stu) {
 void enrollCourse(student& stu, string className, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	Date start, end;
 	defineStartEndRegis(start, end, curTime);
+	cout << start.day << "/" << start.month << "/" << start.year;
+	cout << end.day << "/" << end.month << "/" << end.year;
 	cout << "Course's information list: " << endl;
 	displayCourseConsoleInSem(pHeadCourse, start, end);
-
-
-	if (countEnrolledCourseInSem(stu, pHeadCourse, curTime) == 5) {
-		cout << "Full slot of enrolled course.\n";
-		return;
-	}
 
 	int temp = -1;
 	unsigned long long tempID;
 	while (temp != 0) {
+		if (countEnrolledCourseInSem(stu, pHeadCourse, curTime) == 5) {
+			cout << "Full slot of enrolled course.\n";
+			return;
+		}
+		displayTimetable(stu);
+
 		cout << "Input the course's ID you want to enroll: ";
 		cin >> tempID;
 		if (checkEnrollCourse(tempID, pHeadCourse, stu)) {
 			addEnrolledCourse(stu, className, tempID);
 			addStudentToCourse(stu.Student_ID, tempID);
 			deleteTimeTable(stu);
-
+			
 			readAllIndividualCourseFile(folderDir + folderClassDir, pHeadCourse);
 			stu = findInfoStudent(stu.Student_ID, className);
 			createTimetable(stu, pHeadCourse, curTime);
@@ -611,7 +613,7 @@ void menuManageCourseStudent(student stu, string className) {
 			else {
 				cout << "Not in Registration time\n";
 			}
-
+			
 			system("PAUSE");
 			break;
 		case 2:
@@ -630,10 +632,10 @@ void menuManageCourseStudent(student stu, string className) {
 		case 4: {
 			Date start, end;
 			create_chooseSem(start, end);
-			printScoreboardInSem(stu, pHeadCourse, start, end);
+			printScoreboardInSem(stu, pHeadCourse, start, end); 
 		}
-			  system("PAUSE");
-			  break;
+			system("PAUSE");
+			break;
 		case 0:
 			// thieu delete
 			deleteTimeTable(stu);
@@ -669,14 +671,14 @@ void menuStudent(unsigned long long ID, string className) {
 			menuManageCourseStudent(stu, className);
 			system("PAUSE");
 			break;
-		case 3:
+		case 3: 
 			changePassword(ID, className);
 			system("PAUSE");
 			break;
 		case 0:
 			deleteListScore(stu);
 			break;
-		default:
+		default: 
 			break;
 		}
 	}
