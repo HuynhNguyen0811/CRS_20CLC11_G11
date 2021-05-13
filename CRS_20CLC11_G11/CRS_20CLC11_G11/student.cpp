@@ -50,6 +50,8 @@ void login() {
 				check = checkLoginStudent(path, IDStudent, password, className);
 			}
 			check = 0;
+			IDStudent = NULL;
+			password = "";
 			system("CLS");
 			menuStudent(IDStudent, className);
 			break;

@@ -219,7 +219,7 @@ void createClassListFile(string path, string className) {
 
 void createLogInStudent(string path, _student* pHead, string classname) {
 	ofstream fileOut;
-	fileOut.open(path + ".csv", ios_base::app);
+	fileOut.open(path, ios_base::app);
 	string pass, zero = "0";
 	while (pHead->pNext != nullptr) {
 		fileOut << pHead->data.Student_ID << ",";
