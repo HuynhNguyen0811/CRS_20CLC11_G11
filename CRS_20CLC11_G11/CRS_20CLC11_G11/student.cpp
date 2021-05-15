@@ -29,12 +29,12 @@ void login() {
 	bool check = 0;
 	string path;
 
-	while (flag != 0) {
+	while (flag != '0') {
 		system("CLS");
 		cout << "Login as student or staff:\n1. Student\n2. Staff\n0. Escape\n";
-		cin >> flag;
+		flag = _getch();
 		switch (flag) {
-		case 1:
+		case '1':
 			while (check == 0) {
 				if (IDStudent != NULL && password != "") {
 					cout << "Please enter again\n";
@@ -50,12 +50,12 @@ void login() {
 				check = checkLoginStudent(path, IDStudent, password, className);
 			}
 			check = 0;
-			IDStudent = NULL;
-			password = "";
 			system("CLS");
 			menuStudent(IDStudent, className);
+			IDStudent = NULL;
+			password = "";
 			break;
-		case 2:
+		case '2':
 			while (check == 0) {
 				if (IDStaff != "" && password != "") {
 					cout << "Please enter again\n";
@@ -71,9 +71,9 @@ void login() {
 				check = checkLoginStaff(path, IDStaff, password);
 			}
 			check = 0;
-			IDStaff = password = "";
 			system("CLS");
 			menuStaff();
+			IDStaff = password = "";
 			break;
 		default:
 			break;
@@ -250,7 +250,7 @@ student findInfoStudent(unsigned long long ID, string className) {
 	
 	fileIn.open(folderDir + folderClassDir + className + "\\" + to_string(ID) + csvFormat, ios_base::in);
 	fileIn.imbue(std::locale(std::locale::empty(), new std::codecvt_utf8<wchar_t, 0x10ffff, std::generate_header>));
-	fileIn.ignore(1000, wchar_t(0xfeff));
+	//fileIn.ignore(1000, wchar_t(0xfeff));
 
 	student stu;
 
@@ -528,7 +528,6 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 			cout << "Full slot of enrolled course.\n";
 			return;
 		}
-		displayTimetable(stu);
 
 		cout << "Input the course's ID you want to enroll: ";
 		cin >> tempID;
@@ -599,16 +598,15 @@ void menuManageCourseStudent(student stu, string className) {
 	readCourseFile(folderDir + folderCourseDir + courseListDir, pHeadCourse);
 	readAllIndividualCourseFile(folderDir + folderCourseDir, pHeadCourse);
 	Date curTime = getSystemDate();
-	//create time table -> chuyen sang phan enroll va remove course
+	//create time table
 	createTimetable(stu, pHeadCourse, curTime);
 
-	while (flag != 0) {
+	while (flag != '0') {
 		system("CLS");
 		cout << "1. Enroll course\n2. View enrolled course\n3. Remove enrolled course\n4. View scoreboard\n0. Back to main menu\n";
-		cin >> flag;
-
+		flag = _getch();
 		switch (flag) {
-		case 1:
+		case '1':
 			if (checkRegisTime(curTime)) {
 				enrollCourse(stu, className, pHeadCourse, curTime);
 			}
@@ -618,11 +616,11 @@ void menuManageCourseStudent(student stu, string className) {
 			
 			system("PAUSE");
 			break;
-		case 2:
+		case '2':
 			viewEnrollCourse(stu, pHeadCourse, curTime);
 			system("PAUSE");
 			break;
-		case 3:
+		case '3':
 			if (checkRegisTime(curTime)) {
 				removeEnrollCourse(stu, className, pHeadCourse, curTime);
 			}
@@ -631,15 +629,14 @@ void menuManageCourseStudent(student stu, string className) {
 			}
 			system("PAUSE");
 			break;
-		case 4: {
+		case '4': {
 			Date start, end;
 			create_chooseSem(start, end);
 			printScoreboardInSem(stu, pHeadCourse, start, end); 
 		}
 			system("PAUSE");
 			break;
-		case 0:
-			// thieu delete
+		case '0':
 			deleteTimeTable(stu);
 			deleteListCourse(pHeadCourse);
 			break;
@@ -655,29 +652,27 @@ void menuStudent(unsigned long long ID, string className) {
 	// find student & return student
 	student stu;
 	stu = findInfoStudent(ID, className);
-
 	// create separate file for that specific student
 	createStudentFile(stu, className);
-
 	//menu
-	while (flag != 0) {
+	while (flag != '0') {
 		system("CLS");
 		cout << "1. View info\n2. Manage course\n3. Change password\n0. Log out\n";
-		cin >> flag;
+		flag = _getch();
 		switch (flag) {
-		case 1:
+		case '1':
 			printInfoStudent(stu);
 			system("PAUSE");
 			break;
-		case 2:
+		case '2':
 			menuManageCourseStudent(stu, className);
 			system("PAUSE");
 			break;
-		case 3: 
+		case '3': 
 			changePassword(ID, className);
 			system("PAUSE");
 			break;
-		case 0:
+		case '0':
 			deleteListScore(stu);
 			break;
 		default: 
