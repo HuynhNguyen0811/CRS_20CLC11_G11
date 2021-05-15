@@ -36,19 +36,21 @@ void login() {
 		switch (flag) {
 		case '1':
 			while (check == 0) {
-				if (IDStudent != NULL && password != "") {
-					cout << "Please enter again\n";
-					cout << "Enter 0 if you want to come back to main menu: ";
-					cin >> out;
-					if (out == 0) break;
-				}
+				out = 1;
 				cout << "ID: ";
 				cin >> IDStudent;
 				cout << "Password: ";
 				cin >> password;
 				path = folderDir + passStudentDir;
 				check = checkLoginStudent(path, IDStudent, password, className);
+				if (check == 1) break;
+				cout << "Enter 0 if you want to come back to main menu: ";
+				cin >> out;
+				if (out == 0) break;
+				cout << "Please enter again:\n ";
 			}
+			if (out == 0) flag = 3;
+			if (out == 0) break;
 			check = 0;
 			system("CLS");
 			menuStudent(IDStudent, className);
@@ -57,19 +59,21 @@ void login() {
 			break;
 		case '2':
 			while (check == 0) {
-				if (IDStaff != "" && password != "") {
-					cout << "Please enter again\n";
-					cout << "Enter 0 if you want to come back to main menu: ";
-					cin >> out;
-					if (out == 0) break;
-				}
+				out = 1;
 				cout << "Username: ";
 				cin >> IDStaff;
 				cout << "Password: ";
 				cin >> password;
-				path = folderDir + "passStaff" + csvFormat;
+				path = folderDir + passStaffDir;
 				check = checkLoginStaff(path, IDStaff, password);
+				if (check == 1) break;
+				cout << "Enter 0 if you want to come back to main menu: ";
+				cin >> out;
+				if (out == 0) break;
+				cout << "Please enter again:\n ";
 			}
+			if (out == 0) flag = 3;
+			if (out == 0) break;
 			check = 0;
 			system("CLS");
 			menuStaff();
@@ -185,13 +189,15 @@ bool checkLoginStudent(string path, unsigned long long ID, string password, stri
 bool checkLoginStaff(string path, string ID, string password) {
 	ifstream fileIn;
 	fileIn.open(path, ios_base::in);
-
-	string tempPassword, tempID, checkPassword = "", checkID = "";
-	while (fileIn) {
-		getline(fileIn, tempID, ',');
-		fileIn >> tempPassword;
-
-		if (tempID == ID && tempPassword == password)
+	cout << ID << password;
+	string tempID, tempPassword, checkPassword = "", checkID, line;
+	while(fileIn)
+	{
+		getline(fileIn, line);
+		stringstream s(line);
+		getline(s, tempID, ',');
+		s >> tempPassword;
+		if ( tempID == ID && tempPassword == password )
 		{
 			fileIn.close();
 			return 1;

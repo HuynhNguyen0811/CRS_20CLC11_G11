@@ -9,9 +9,10 @@
 
 #include <time.h>  //take time
 
-#include <string>
+#include <string> 
 #include <fstream>
 #include <filesystem>
+#include <sstream>
 
 #include<io.h>
 #include <fcntl.h>
