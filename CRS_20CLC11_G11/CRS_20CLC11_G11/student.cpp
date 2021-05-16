@@ -190,13 +190,11 @@ bool checkLoginStaff(string path, string ID, string password) {
 	ifstream fileIn;
 	fileIn.open(path, ios_base::in);
 	cout << ID << password;
-	string tempID, tempPassword, checkPassword = "", checkID, line;
+	string tempID, tempPassword;
 	while(fileIn)
 	{
-		getline(fileIn, line);
-		stringstream s(line);
-		getline(s, tempID, ',');
-		s >> tempPassword;
+		getline(fileIn, tempID, ',');
+		fileIn >> tempPassword;
 		if ( tempID == ID && tempPassword == password )
 		{
 			fileIn.close();

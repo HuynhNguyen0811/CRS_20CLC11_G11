@@ -194,7 +194,7 @@ void displayStuInClassConsole(_student* pHead) {
 	_LText();
 	
 	while (pHead != nullptr && pHead->pNext != nullptr) {
-		wcout << pHead->data.No << L"," << pHead->data.Student_ID << L"," << pHead->data.FirstName << L"," << pHead->data.LastName << L"," << pHead->data.Gender << L"," << pHead->data.Date_Of_Birth.day << wchar_t(47) << pHead->data.Date_Of_Birth.month << wchar_t(47) << pHead->data.Date_Of_Birth.year << L"," << pHead->data.Social_ID << endl;
+		wcout << pHead->data.No << L" " << pHead->data.Student_ID << L" " << pHead->data.FirstName << L" " << pHead->data.LastName << L"," << pHead->data.Gender << L"," << pHead->data.Date_Of_Birth.day << wchar_t(47) << pHead->data.Date_Of_Birth.month << wchar_t(47) << pHead->data.Date_Of_Birth.year << L"," << pHead->data.Social_ID << endl;
 		pHead = pHead->pNext;
 	}
 
