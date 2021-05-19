@@ -46,6 +46,7 @@ void addCourseFile(string path, _course* pHead);
 void addIndividualCourseFile(string path, course pHead);
 
 void displayCourseConsole(_course* pHead);
+void displayCourseConsoleInSem(_course* pHead, Date start, Date end);
 void displayIndividualCourseConsole(course pHead);
 
 void displayStudentAttendIndividualCourse(_studentRegis* pHead);

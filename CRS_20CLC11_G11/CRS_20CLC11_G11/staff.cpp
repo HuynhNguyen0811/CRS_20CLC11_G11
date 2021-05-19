@@ -342,7 +342,7 @@ void displayClassAndStudent() {
 	}
 }
 
-//-----------------------------------------------------------------------
+//----------------------------------------------------------
 
 void inputFromKeyboardCourseInSem(_course*& pHead, Date start, Date end) {
 	_course* pCur = nullptr;
@@ -485,11 +485,11 @@ void readCourseFileInSem(string path, _course*& pHead, Date start, Date end) {
 		getline(fileIn, tempCredit, a);
 		getline(fileIn, tempMaxStu, a);
 
-		getline(fileIn, pCur->data.session[0].dayOfWeek, a);
-		getline(fileIn, pCur->data.session[0].hour, a);
+		getline(fileIn, tempSD1, a);
+		getline(fileIn, tempSH1, a);
 
-		getline(fileIn, pCur->data.session[1].dayOfWeek, a);
-		getline(fileIn, pCur->data.session[1].hour, a);
+		getline(fileIn, tempSD2, a);
+		getline(fileIn, tempSH2, a);
 
 		getline(fileIn, tempDate1, a);
 		getline(fileIn, tempDate2, b);
@@ -780,8 +780,11 @@ void displayCourseConsole(_course* pHead) {
 void displayCourseConsoleInSem(_course* pHead, Date start, Date end) {
 	_LText();
 
-	while (pHead->pNext != nullptr) {
-		if (pHead->data.startRegis != start) continue;
+	while (pHead != nullptr && pHead->pNext != nullptr) {
+		if (pHead->data.startRegis != start) {
+			pHead = pHead->pNext; 
+			continue;
+		}
 		wcout << pHead->data.courseId << " ";
 		wcout << pHead->data.courseName << " ";
 		wcout << pHead->data.teacherName << " ";
@@ -938,7 +941,7 @@ void editCourseInSem(Date start, Date end) {
 	displayIndividualCourseConsole(pEdit->data);
 
 	cout << "All course's information:" << endl;
-	displayCourseConsole(pHead);
+	displayCourseConsoleInSem(pHead, start, end);
 
 	writeCourseFile(FolderPath + coursePath, pHead);
 
@@ -960,7 +963,6 @@ void removeCourseInSem(Date start, Date end) {
 	unsigned long long tempID;
 	cout << "Enter the ID of the course you want to remove: ";
 	cin >> tempID;
-	//------------- check
 	pRemove = findCourseInSem(tempID, pHead, start, end);
 	if (pRemove == nullptr) {
 		cout << "Can't find!\n";
@@ -988,7 +990,7 @@ void viewAttendStudentInSem(Date start, Date end) {
 	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
 
 	cout << "Course's information list: " << endl;
-	displayCourseConsoleInSem(pHead, start, end); //-------------
+	displayCourseConsoleInSem(pHead, start, end); 
 
 	unsigned long long tempID;
 	_student* pHeadStu = nullptr, * pCreateStu = nullptr, * pDisplayStu = nullptr;
@@ -1005,8 +1007,8 @@ void viewAttendStudentInSem(Date start, Date end) {
 	while (temp != 0) {
 		cout << "Enter the ID of the course you want to view student list: ";
 		cin >> tempID;
-		//-------------
-		pDisplay = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID //-------------
+		
+		pDisplay = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID 
 		if (pDisplay == nullptr) {
 			cout << "Can't find!\n";
 			continue;
@@ -1080,7 +1082,7 @@ void writeAttendStudentInSem(Date start, Date end) {
 	readAccount("Data\\passStudent.csv", pHeadAccount); //list of ID and class name of every student
 
 	cout << "Course's information list: " << endl;
-	displayCourseConsoleInSem(pHead, start, end); //-------------
+	displayCourseConsoleInSem(pHead, start, end); 
 
 	unsigned long long tempID;
 	_student* pHeadStu = nullptr, * pCreateStu = nullptr, * pDisplayStu = nullptr;
@@ -1098,8 +1100,8 @@ void writeAttendStudentInSem(Date start, Date end) {
 	while (temp != 0) {
 		cout << "Enter the ID of the course you want to view student list: ";
 		cin >> tempID;
-		//-------------
-		pDisplay = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID //-------------
+		
+		pDisplay = findCourseInSem(tempID, pHead, start, end); //have list of attend student's ID 
 		if (pDisplay == nullptr) continue;
 		pCurStu = pDisplay->data.studentID;
 		pCurAccount = pHeadAccount;
@@ -1164,7 +1166,7 @@ void writeAttendStudentInSem(Date start, Date end) {
 }
 
 
-//-----------------------------------------------------------------------
+//----------------------------------------------------------
 
 //coi nhu nguoi dung input du cot diem cua toan bo sv
 void readScoreboard(string path, _course*& course) {
@@ -1291,7 +1293,7 @@ void inputScoreboardInSem(Date start, Date end) {
 
 	//display list of courses
 	cout << "Course's information list: " << endl;
-	//-------------
+	
 	displayCourseConsoleInSem(pHead, start, end);
 
 	//choose course
@@ -1299,7 +1301,7 @@ void inputScoreboardInSem(Date start, Date end) {
 	cout << "Enter the ID of the course you want to import scoreboard: ";
 	cin >> tempID;
 	//find course
-	pEdit = findCourseInSem(tempID, pHead, start, end);//-------------
+	pEdit = findCourseInSem(tempID, pHead, start, end);
 	if (pEdit == nullptr) {
 		cout << "Can't find!\n";
 		deleteListCourse(pHead);
@@ -1333,7 +1335,7 @@ void viewScoreboardCourseInSem(Date start, Date end) {
 
 	//display list of courses
 	cout << "Course's information list: " << endl;
-	displayCourseConsoleInSem(pHead, start, end);//-------------
+	displayCourseConsoleInSem(pHead, start, end);
 
 	//choose course
 	unsigned long long tempID;
@@ -1406,7 +1408,7 @@ void viewScoreboardClassInSem(Date start, Date end) {
 
 	_course* pHeadCourse = nullptr, * pCurCourse = nullptr;
 	path = folderPath + coursePath + courseListPath;
-	readCourseFileInSem(path, pHeadCourse, start, end);//-------------
+	readCourseFile(path, pHeadCourse);
 
 	_score* pCurScore = nullptr;
 
@@ -1483,6 +1485,10 @@ void viewScoreboardClassInSem(Date start, Date end) {
 		double overallGPA = 0;
 		int count = 0;
 		while (pCurCourse != nullptr && pCurCourse->pNext != nullptr) {
+			if (pCurCourse->data.startRegis != start) {
+				pCurCourse = pCurCourse->pNext;
+				continue;
+			}
 			//while for loop course that student attends
 			i += 12;
 			GotoXY(i + 5, 0);
@@ -1537,7 +1543,7 @@ void editScoreFromCourseInSem(Date start, Date end) {
 
 	//display list of courses
 	cout << "Course's information list: " << endl;
-	displayCourseConsoleInSem(pHead, start, end);//-------------
+	displayCourseConsoleInSem(pHead, start, end);
 
 	//choose course
 	unsigned long long tempID, tempStuID;

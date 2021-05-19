@@ -106,6 +106,7 @@ void login() {
 	}
 }
 
+//display
 void findAndPrintStudent(unsigned long long ID, string className) {
 	wifstream fileIn;
 	string folderName = "Data\\Classes\\";
@@ -179,6 +180,7 @@ void printScoreboardInSem(student stu, _course* pHeadCourse, Date start, Date en
 	
 }
 
+//login
 bool checkLoginStudent(string path, unsigned long long ID, string password, string& className) {
 	ifstream fileIn;
 	fileIn.open(path, ios_base::in);
@@ -243,7 +245,6 @@ void changePassword(unsigned long long ID, string className) {
 	return;
 }
 
-//-------------
 int countEnrolledCourse(student stu) {
 	int result = 0;
 	_score* pCur = stu.score;
@@ -430,7 +431,6 @@ bool checkConflictCourse(student stu, course course) {
 	return 1;
 }
 
-//-------------
 void createTimetable(student& stu, _course* pHeadCourse, Date curTime = getSystemDate()) {
 	stu.timeTable = new int* [4];
 	for (int i = 0; i < 4; i++) stu.timeTable[i] = new int[7];
@@ -467,6 +467,45 @@ void createTimetable(student& stu, _course* pHeadCourse, Date curTime = getSyste
 		}
 		pCurCourse = pHeadCourse;
 		pCur = pCur->pNext;
+	}
+}
+
+bool checkRegisTime(Date curTime = getSystemDate()) {
+	Date down, up;
+	down = { 16, 8, curTime.year };
+	up = { 1, 9, curTime.year };
+	if (curTime >= down && curTime <= up) return 1;
+	down = { 16, 12, curTime.year };
+	up = { 1, 1, curTime.year + 1 };
+	if (curTime >= down && curTime <= up) return 1;
+	down = { 16, 5, curTime.year };
+	up = { 1, 6, curTime.year };
+	if (curTime >= down && curTime <= up) return 1;
+	return 0;
+}
+
+void defineStartEndRegis(Date &start, Date &end, Date curTime = getSystemDate()) {
+	Date down, up;
+	down = { 16, 8, curTime.year };
+	up = { 1, 9, curTime.year };
+	if (curTime >= down && curTime <= up) {
+		start = down;
+		end = end;
+		return;
+	}
+	down = { 16, 12, curTime.year };
+	up = { 1, 1, curTime.year + 1 };
+	if (curTime >= down && curTime <= up) {
+		start = down;
+		end = end;
+		return;
+	}
+	down = { 16, 5, curTime.year };
+	up = { 1, 6, curTime.year };
+	if (curTime >= down && curTime <= up) {
+		start = down;
+		end = end;
+		return;
 	}
 }
 
@@ -513,8 +552,10 @@ _score* takeTailEnrollCourse(student stu) {
 
 //-------------
 void enrollCourse(student& stu, string className, _course* pHeadCourse, Date curTime = getSystemDate()) {
+	Date start, end;
+	defineStartEndRegis(start, end, curTime);
 	cout << "Course's information list: " << endl;
-	displayCourseConsole(pHeadCourse);
+	displayCourseConsoleInSem(pHeadCourse, start, end);
 
 	//
 	if (countEnrolledCourseInSem(stu, pHeadCourse, curTime) == 5) {
@@ -545,7 +586,7 @@ void enrollCourse(student& stu, string className, _course* pHeadCourse, Date cur
 
 //-------------
 void viewEnrollCourse(student stu, _course* pHeadCourse, Date curTime = getSystemDate()) {
-	cout << "Total course: " << countEnrolledCourse(stu) << endl;
+	cout << "Total course: " << countEnrolledCourseInSem(stu, pHeadCourse, curTime) << endl;
 	cout << "Enrolled course: " << endl;
 
 	//_course* pDisplay = nullptr;
@@ -598,7 +639,7 @@ void menuManageCourseStudent(student stu, string className) {
 	string FolderPath = "Data\\Course\\", coursePath = "Course.csv", fileFormat = ".csv";
 	readCourseFile(FolderPath + coursePath, pHeadCourse);
 	readAllIndividualCourseFile(FolderPath, pHeadCourse);
-	Date curTime;
+	Date curTime = getSystemDate();
 	//create time table -> chuyen sang phan enroll va remove course
 	createTimetable(stu, pHeadCourse, curTime);
 
@@ -609,7 +650,13 @@ void menuManageCourseStudent(student stu, string className) {
 
 		switch (flag) {
 		case 1:
-			enrollCourse(stu, className, pHeadCourse, curTime);
+			if (checkRegisTime(curTime)) {
+				enrollCourse(stu, className, pHeadCourse, curTime);
+			}
+			else {
+				cout << "Not in Registration time\n";
+			}
+			
 			system("PAUSE");
 			break;
 		case 2:
@@ -617,7 +664,12 @@ void menuManageCourseStudent(student stu, string className) {
 			system("PAUSE");
 			break;
 		case 3:
-			removeEnrollCourse(stu, className, pHeadCourse, curTime);
+			if (checkRegisTime(curTime)) {
+				removeEnrollCourse(stu, className, pHeadCourse, curTime);
+			}
+			else {
+				cout << "Not in Registration time\n";
+			}
 			system("PAUSE");
 			break;
 		case 4: {
@@ -629,6 +681,7 @@ void menuManageCourseStudent(student stu, string className) {
 			break;
 		case 0:
 			// thieu delete
+			
 			break;
 		default:
 			break;
