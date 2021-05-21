@@ -29,11 +29,11 @@ void login() {
 	bool check = 0;
 	string path;
 	string folderName = "Data\\";
-	//string pathSub = "Classes\\", fileFormat = ".csv";
+	string pathSub = "Classes\\", fileFormat = ".csv";
 
 	while (flag != 0) {
 		system("CLS");
-		cout << "Login as student or staff: \n1. Student\n2. Staff\n0. Escape\n";
+		cout << "Login as student or staff:\n1. Student\n2. Staff\n0. Escape\n";
 		cin >> flag;
 		switch (flag) {
 		case 1:
